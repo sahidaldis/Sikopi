@@ -74,14 +74,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "My Orto Clinic" },
+      { name: "description", content: "Clinic Compass is a desktop web application for managing small independent clinics." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "My Orto Clinic" },
+      { property: "og:description", content: "Clinic Compass is a desktop web application for managing small independent clinics." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "My Orto Clinic" },
+      { name: "twitter:description", content: "Clinic Compass is a desktop web application for managing small independent clinics." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a73c78b9-26a7-4913-b456-986c11997e7a/id-preview-f06c6b67--b1c770a5-667c-404d-bfd0-668c61b33c5e.lovable.app-1778993567202.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a73c78b9-26a7-4913-b456-986c11997e7a/id-preview-f06c6b67--b1c770a5-667c-404d-bfd0-668c61b33c5e.lovable.app-1778993567202.png" },
     ],
     links: [
       {
