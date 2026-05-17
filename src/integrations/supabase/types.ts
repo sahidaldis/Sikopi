@@ -14,13 +14,183 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      billing: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          visit_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          visit_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: true
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cppt_records: {
+        Row: {
+          assessment: string | null
+          created_at: string
+          id: string
+          objective: string | null
+          planning: string | null
+          subjective: string | null
+          visit_id: string
+        }
+        Insert: {
+          assessment?: string | null
+          created_at?: string
+          id?: string
+          objective?: string | null
+          planning?: string | null
+          subjective?: string | null
+          visit_id: string
+        }
+        Update: {
+          assessment?: string | null
+          created_at?: string
+          id?: string
+          objective?: string | null
+          planning?: string | null
+          subjective?: string | null
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cppt_records_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: true
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          address: string | null
+          allergy_details: string | null
+          allergy_flag: boolean
+          created_at: string
+          dob: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          mrn: string
+          national_id: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          allergy_details?: string | null
+          allergy_flag?: boolean
+          created_at?: string
+          dob?: string | null
+          full_name: string
+          gender?: string | null
+          id?: string
+          mrn?: string
+          national_id?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          allergy_details?: string | null
+          allergy_flag?: boolean
+          created_at?: string
+          dob?: string | null
+          full_name?: string
+          gender?: string | null
+          id?: string
+          mrn?: string
+          national_id?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      visits: {
+        Row: {
+          anamnesis: string | null
+          created_at: string
+          discharge_condition: string | null
+          final_diagnosis: string | null
+          followup: string | null
+          id: string
+          instructions: string | null
+          main_complaint: string | null
+          medication: string | null
+          patient_id: string
+          physical_exam: string | null
+          procedures: string | null
+          tariff: number
+          visited_at: string
+        }
+        Insert: {
+          anamnesis?: string | null
+          created_at?: string
+          discharge_condition?: string | null
+          final_diagnosis?: string | null
+          followup?: string | null
+          id?: string
+          instructions?: string | null
+          main_complaint?: string | null
+          medication?: string | null
+          patient_id: string
+          physical_exam?: string | null
+          procedures?: string | null
+          tariff?: number
+          visited_at?: string
+        }
+        Update: {
+          anamnesis?: string | null
+          created_at?: string
+          discharge_condition?: string | null
+          final_diagnosis?: string | null
+          followup?: string | null
+          id?: string
+          instructions?: string | null
+          main_complaint?: string | null
+          medication?: string | null
+          patient_id?: string
+          physical_exam?: string | null
+          procedures?: string | null
+          tariff?: number
+          visited_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visits_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_mrn: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
