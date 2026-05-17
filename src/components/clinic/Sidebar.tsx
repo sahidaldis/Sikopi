@@ -4,11 +4,12 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
 
-const items = [
+type Item = { to: "/" | "/patients" | "/reports"; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+const items: Item[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/patients", label: "Patients", icon: Users },
   { to: "/reports", label: "Reports", icon: BarChart3 },
-] as const;
+];
 
 export function ClinicSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
