@@ -27,7 +27,7 @@ type Visit = {
   physical_exam: string | null; medication: string | null; procedures: string | null;
   instructions: string | null; final_diagnosis: string | null; discharge_condition: string | null;
   followup: string | null; tariff: number;
-  cppt_records: { subjective: string | null; objective: string | null; assessment: string | null; planning: string | null }[];
+  cppt_records: { subjective: string | null; objective: string | null; assessment: string | null; planning: string | null } | { subjective: string | null; objective: string | null; assessment: string | null; planning: string | null }[] | null;
 };
 
 function PatientDetailPage() {
@@ -45,7 +45,7 @@ function PatientDetailPage() {
       supabase.from("visits").select("*, cppt_records(subjective, objective, assessment, planning)").eq("patient_id", id).order("visited_at", { ascending: false }),
     ]);
     setPatient(p as Patient | null);
-    setVisits((v ?? []) as Visit[]);
+    setVisits((v ?? []) as unknown as Visit[]);
     setLoading(false);
   };
   useEffect(() => { load(); }, [id]);
@@ -115,7 +115,7 @@ function PatientDetailPage() {
 
         <TabsContent value="cppt" className="space-y-3 mt-4">
           {visits.length === 0 ? <EmptyState text="No CPPT records." /> : visits.map((v) => {
-            const c = v.cppt_records?.[0];
+            const c = Array.isArray(v.cppt_records) ? v.cppt_records[0] : v.cppt_records;
             return (
               <Card key={v.id} className="p-5">
                 <div className="font-medium mb-2">{formatDateTime(v.visited_at)}</div>
