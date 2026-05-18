@@ -117,6 +117,38 @@ export function VisitFields({
     set({ assessment: next.join(", ") });
   };
 
+  // Parsing state.followup for Follow-up Instructions
+  const parsedFollowups = state.followup
+    ? state.followup.split(", ").map((f) => f.trim()).filter(Boolean)
+    : [];
+
+  const followupOptions = [
+    "Kontrol ulang",
+    "Home care",
+    "Rujuk ke Rumah Sakit",
+    "Latihan mandiri di rumah",
+    "Edukasi lanjutan"
+  ];
+
+  const handleFollowupToggle = (opt: string, checked: boolean) => {
+    let next = [...parsedFollowups];
+    if (checked) {
+      if (!next.includes(opt)) {
+        next.push(opt);
+      }
+    } else {
+      next = next.filter((f) => f !== opt);
+    }
+    
+    // Maintain standard order
+    const sorted: string[] = [];
+    followupOptions.forEach((f) => {
+      if (next.includes(f)) sorted.push(f);
+    });
+
+    set({ followup: sorted.join(", ") });
+  };
+
   // Parsing state.procedures for Supporting Examinations
   const rawProcedures = state.procedures || "";
   const parsedProcedures = (() => {
@@ -362,8 +394,25 @@ export function VisitFields({
           <Input value={state.discharge_condition} onChange={(e) => set({ discharge_condition: e.target.value })} />
         </div>
         <div>
-          <Label>Follow-up Instructions</Label>
-          <Textarea rows={2} value={state.followup} onChange={(e) => set({ followup: e.target.value })} />
+          <Label className="text-sm font-semibold mb-2 block">Follow-up Instructions</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border bg-muted/20">
+            {followupOptions.map((opt) => {
+              const isChecked = parsedFollowups.includes(opt);
+              return (
+                <label
+                  key={opt}
+                  className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors text-sm"
+                >
+                  <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={(checked) => handleFollowupToggle(opt, !!checked)}
+                    className="mt-0.5"
+                  />
+                  <span>{opt}</span>
+                </label>
+              );
+            })}
+          </div>
         </div>
       </Section>
 
