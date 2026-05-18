@@ -1,15 +1,16 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, BarChart3, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
 import logoUrl from "@/logo.png";
 
-type Item = { to: "/" | "/patients" | "/reports"; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+type Item = { to: "/" | "/patients" | "/reports" | "/settings"; label: string; icon: typeof LayoutDashboard; exact?: boolean };
 const items: Item[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/patients", label: "Patients", icon: Users },
   { to: "/reports", label: "Reports", icon: BarChart3 },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function ClinicSidebar({ onItemClick }: { onItemClick?: () => void }) {
