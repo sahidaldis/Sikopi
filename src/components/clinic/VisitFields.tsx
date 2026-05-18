@@ -126,7 +126,7 @@ export function VisitFields({
 
       <Section num={startSection + 5} title="Medical Resume / Discharge Summary">
         <div>
-          <Label>Final Diagnosis</Label>
+          <Label>Medical Diagnosis</Label>
           <Input value={state.final_diagnosis} onChange={(e) => set({ final_diagnosis: e.target.value })} />
         </div>
         <div>
