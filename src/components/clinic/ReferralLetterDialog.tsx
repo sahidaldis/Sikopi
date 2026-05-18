@@ -235,7 +235,7 @@ export function ReferralLetterDialog({
               <div className="flex items-center gap-4 border-b-2 border-black pb-2 mb-4">
                 <img src={ppniLogoUrl} alt="PPNI Logo" className="h-12 w-12 sm:h-14 sm:w-14 object-contain shrink-0" />
                 <div className="flex-1 text-center pr-12 font-serif">
-                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wide">PRAKTIK MANDIRI PERAWAT</h2>
+                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wide">PRAKTIK KEPERAWATAN</h2>
                   <p className="text-[8px] leading-tight text-gray-700">Klegen Rt. 002 Rw. 015, Planggu, Trucuk - Klaten</p>
                 </div>
               </div>
