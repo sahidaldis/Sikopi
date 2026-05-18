@@ -117,6 +117,63 @@ export function VisitFields({
     set({ assessment: next.join(", ") });
   };
 
+  // Parsing state.procedures for Supporting Examinations
+  const rawProcedures = state.procedures || "";
+  const parsedProcedures = (() => {
+    const res = { lab: "", pa: "", rad: "", kultur: "", labChecked: false, paChecked: false, radChecked: false, kulturChecked: false };
+    if (!rawProcedures) return res;
+    
+    const parts = rawProcedures.split(" | ");
+    parts.forEach((part) => {
+      const idx = part.indexOf(":");
+      if (idx === -1) return;
+      const key = part.slice(0, idx).trim();
+      const val = part.slice(idx + 1).trim();
+      
+      const cleanVal = val === "—" ? "" : val;
+      
+      if (key === "Laboratorium") {
+        res.lab = cleanVal;
+        res.labChecked = true;
+      } else if (key === "PA") {
+        res.pa = cleanVal;
+        res.paChecked = true;
+      } else if (key === "Radiologi") {
+        res.rad = cleanVal;
+        res.radChecked = true;
+      } else if (key === "Kultur") {
+        res.kultur = cleanVal;
+        res.kulturChecked = true;
+      }
+    });
+    return res;
+  })();
+
+  const updateProcedureField = (field: "lab" | "pa" | "rad" | "kultur", checked: boolean, val: string) => {
+    const current = { ...parsedProcedures };
+    if (field === "lab") {
+      current.labChecked = checked;
+      current.lab = val;
+    } else if (field === "pa") {
+      current.paChecked = checked;
+      current.pa = val;
+    } else if (field === "rad") {
+      current.radChecked = checked;
+      current.rad = val;
+    } else if (field === "kultur") {
+      current.kulturChecked = checked;
+      current.kultur = val;
+    }
+
+    const parts: string[] = [];
+    if (current.labChecked) parts.push(`Laboratorium: ${current.lab.trim() || "—"}`);
+    if (current.paChecked) parts.push(`PA: ${current.pa.trim() || "—"}`);
+    if (current.radChecked) parts.push(`Radiologi: ${current.rad.trim() || "—"}`);
+    if (current.kulturChecked) parts.push(`Kultur: ${current.kultur.trim() || "—"}`);
+    
+    set({ procedures: parts.join(" | ") });
+  };
+
   return (
     <>
       <Section num={startSection} title="Clinical Notes">
@@ -152,8 +209,90 @@ export function VisitFields({
             <Label>Objective (O)</Label>
             <Textarea rows={3} value={state.objective} onChange={(e) => set({ objective: e.target.value })} />
           </div>
-          <div className="md:col-span-2">
-            <Label className="text-sm font-semibold mb-2 block">Nursing Diagnosis</Label>
+
+          <div className="md:col-span-2 border-t pt-4 mt-2">
+            <Label className="text-sm font-semibold mb-3 block text-primary">Hasil Pemeriksaan Penunjang (Di isi manual)</Label>
+            <div className="space-y-3 p-4 rounded-xl border bg-muted/20">
+              {/* Laboratorium */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label className="flex items-center gap-2.5 min-w-[160px] cursor-pointer text-sm">
+                  <Checkbox
+                    checked={parsedProcedures.labChecked}
+                    onCheckedChange={(checked) => updateProcedureField("lab", !!checked, parsedProcedures.lab)}
+                  />
+                  <span className="font-medium">Laboratorium :</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Masukkan hasil laboratorium..."
+                  value={parsedProcedures.lab}
+                  onChange={(e) => updateProcedureField("lab", parsedProcedures.labChecked, e.target.value)}
+                  disabled={!parsedProcedures.labChecked}
+                  className="flex-1"
+                />
+              </div>
+
+              {/* PA */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label className="flex items-center gap-2.5 min-w-[160px] cursor-pointer text-sm">
+                  <Checkbox
+                    checked={parsedProcedures.paChecked}
+                    onCheckedChange={(checked) => updateProcedureField("pa", !!checked, parsedProcedures.pa)}
+                  />
+                  <span className="font-medium">PA (Patologi Anatomi) :</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Masukkan hasil patologi anatomi..."
+                  value={parsedProcedures.pa}
+                  onChange={(e) => updateProcedureField("pa", parsedProcedures.paChecked, e.target.value)}
+                  disabled={!parsedProcedures.paChecked}
+                  className="flex-1"
+                />
+              </div>
+
+              {/* Radiologi */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label className="flex items-center gap-2.5 min-w-[160px] cursor-pointer text-sm">
+                  <Checkbox
+                    checked={parsedProcedures.radChecked}
+                    onCheckedChange={(checked) => updateProcedureField("rad", !!checked, parsedProcedures.rad)}
+                  />
+                  <span className="font-medium">Radiologi :</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Masukkan hasil radiologi (X-Ray, MRI, dll)..."
+                  value={parsedProcedures.rad}
+                  onChange={(e) => updateProcedureField("rad", parsedProcedures.radChecked, e.target.value)}
+                  disabled={!parsedProcedures.radChecked}
+                  className="flex-1"
+                />
+              </div>
+
+              {/* Kultur */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label className="flex items-center gap-2.5 min-w-[160px] cursor-pointer text-sm">
+                  <Checkbox
+                    checked={parsedProcedures.kulturChecked}
+                    onCheckedChange={(checked) => updateProcedureField("kultur", !!checked, parsedProcedures.kultur)}
+                  />
+                  <span className="font-medium">Kultur :</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Masukkan hasil kultur..."
+                  value={parsedProcedures.kultur}
+                  onChange={(e) => updateProcedureField("kultur", parsedProcedures.kulturChecked, e.target.value)}
+                  disabled={!parsedProcedures.kulturChecked}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="md:col-span-2 border-t pt-4 mt-2">
+            <Label className="text-sm font-semibold mb-2 block text-primary">Nursing Diagnosis</Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border bg-muted/20">
               {standardDiagnoses.map((diag) => {
                 const isChecked = parsedDiagnoses.includes(diag);
