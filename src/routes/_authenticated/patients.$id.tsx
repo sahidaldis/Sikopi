@@ -141,35 +141,7 @@ function PatientDetailPage() {
             <Card key={v.id} className="p-5">
               <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
                 <div className="font-medium">{formatDateTime(v.visited_at)}</div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 gap-1 px-2"
-                    onClick={() => {
-                      setActiveDiagnosis(v.final_diagnosis || "");
-                      setActiveAnamnesis(v.anamnesis || "");
-                      setSickLeaveOpen(true);
-                    }}
-                  >
-                    <FileText className="size-3" /> Surat Sakit
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 gap-1 px-2"
-                    onClick={() => {
-                      setActiveDiagnosis(v.final_diagnosis || "");
-                      setActiveAnamnesis(v.anamnesis || "");
-                      setActiveMedication(v.medication || "");
-                      setActivePhysicalExam(v.physical_exam || "");
-                      setReferralOpen(true);
-                    }}
-                  >
-                    <FileText className="size-3" /> Surat Rujukan
-                  </Button>
-                  <div className="text-sm text-muted-foreground">{formatIDR(v.tariff)}</div>
-                </div>
+                <div className="text-sm text-muted-foreground">{formatIDR(v.tariff)}</div>
               </div>
               <div className="text-sm space-y-1">
                 {v.main_complaint && <div><b>Complaint:</b> {v.main_complaint}</div>}
