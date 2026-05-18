@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export type VisitFieldsState = {
   visited_at: string;
@@ -67,6 +68,55 @@ export function VisitFields({
   startSection?: number;
   allergySection?: React.ReactNode;
 }) {
+  const parsedDiagnoses = state.assessment
+    ? state.assessment.split(", ").map((d) => d.trim()).filter(Boolean)
+    : [];
+
+  const standardDiagnoses = [
+    "Nyeri akut",
+    "Nyeri kronis",
+    "Gangguan mobilitas fisik",
+    "Risiko infeksi",
+    "Kerusakan integritas kulit",
+    "Defisit perawatan diri",
+    "Risiko jatuh",
+    "Intoleransi aktivitas",
+    "Ansietas",
+    "Risiko perfusi perifer tidak efektif"
+  ];
+
+  const customDiagnosis = parsedDiagnoses.find((d) => !standardDiagnoses.includes(d)) || "";
+
+  const handleDiagnosisToggle = (diag: string, checked: boolean) => {
+    let next = [...parsedDiagnoses];
+    if (checked) {
+      if (!next.includes(diag)) {
+        next.push(diag);
+      }
+    } else {
+      next = next.filter((d) => d !== diag);
+    }
+    
+    const sorted: string[] = [];
+    standardDiagnoses.forEach((d) => {
+      if (next.includes(d)) sorted.push(d);
+    });
+    const customInNext = next.find((d) => !standardDiagnoses.includes(d));
+    if (customInNext) {
+      sorted.push(customInNext);
+    }
+
+    set({ assessment: sorted.join(", ") });
+  };
+
+  const handleCustomDiagnosisChange = (val: string) => {
+    let next = parsedDiagnoses.filter((d) => standardDiagnoses.includes(d));
+    if (val.trim()) {
+      next.push(val.trim());
+    }
+    set({ assessment: next.join(", ") });
+  };
+
   return (
     <>
       <Section num={startSection} title="Clinical Notes">
@@ -102,11 +152,50 @@ export function VisitFields({
             <Label>Objective (O)</Label>
             <Textarea rows={3} value={state.objective} onChange={(e) => set({ objective: e.target.value })} />
           </div>
-          <div>
-            <Label>Assessment (A)</Label>
-            <Textarea rows={3} value={state.assessment} onChange={(e) => set({ assessment: e.target.value })} />
+          <div className="md:col-span-2">
+            <Label className="text-sm font-semibold mb-2 block">Nursing Diagnosis</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border bg-muted/20">
+              {standardDiagnoses.map((diag) => {
+                const isChecked = parsedDiagnoses.includes(diag);
+                return (
+                  <label
+                    key={diag}
+                    className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors text-sm"
+                  >
+                    <Checkbox
+                      checked={isChecked}
+                      onCheckedChange={(checked) => handleDiagnosisToggle(diag, !!checked)}
+                      className="mt-0.5"
+                    />
+                    <span>{diag}</span>
+                  </label>
+                );
+              })}
+              <div className="sm:col-span-2 border-t pt-3 mt-1 flex flex-col gap-2">
+                <label className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors text-sm">
+                  <Checkbox
+                    checked={!!customDiagnosis}
+                    onCheckedChange={(checked) => {
+                      if (!checked) {
+                        handleCustomDiagnosisChange("");
+                      } else {
+                        handleCustomDiagnosisChange("Lainnya");
+                      }
+                    }}
+                  />
+                  <span>Lainnya :</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Tulis diagnosis keperawatan manual lainnya..."
+                  value={customDiagnosis === "Lainnya" ? "" : customDiagnosis}
+                  onChange={(e) => handleCustomDiagnosisChange(e.target.value)}
+                  className="ml-8 w-full max-w-md"
+                />
+              </div>
+            </div>
           </div>
-          <div>
+          <div className="md:col-span-2">
             <Label>Planning (P)</Label>
             <Textarea rows={3} value={state.planning} onChange={(e) => set({ planning: e.target.value })} />
           </div>
