@@ -92,7 +92,7 @@ export function VisitFields({
         <Textarea rows={5} value={state.physical_exam} onChange={(e) => set({ physical_exam: e.target.value })} />
       </Section>
 
-      <Section num={startSection + 3} title="Diagnosis and Management (CPPT — SOAP)">
+      <Section num={startSection + 3} title="Nursing Care Plan">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Subjective (S)</Label>
