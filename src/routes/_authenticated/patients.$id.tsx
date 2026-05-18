@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Plus, Pencil, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { SickLeaveDialog } from "@/components/clinic/SickLeaveDialog";
+import { ReferralLetterDialog } from "@/components/clinic/ReferralLetterDialog";
 import { ageFromDob, formatDate, formatDateTime, formatIDR } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/patients/$id")({
@@ -42,8 +43,11 @@ function PatientDetailPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [sickLeaveOpen, setSickLeaveOpen] = useState(false);
+  const [referralOpen, setReferralOpen] = useState(false);
   const [activeDiagnosis, setActiveDiagnosis] = useState("");
   const [activeAnamnesis, setActiveAnamnesis] = useState("");
+  const [activeMedication, setActiveMedication] = useState("");
+  const [activePhysicalExam, setActivePhysicalExam] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -102,6 +106,19 @@ function PatientDetailPage() {
             >
               <FileText className="size-4 mr-2" /> Surat Sakit
             </Button>
+            <Button
+              variant="outline"
+              className="text-indigo-600 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+              onClick={() => {
+                setActiveDiagnosis(visits[0]?.final_diagnosis || "");
+                setActiveAnamnesis(visits[0]?.anamnesis || "");
+                setActiveMedication(visits[0]?.medication || "");
+                setActivePhysicalExam(visits[0]?.physical_exam || "");
+                setReferralOpen(true);
+              }}
+            >
+              <FileText className="size-4 mr-2" /> Surat Rujukan
+            </Button>
             <Button asChild>
               <Link to="/patients/$id/visits/new" params={{ id }}>
                 <Plus className="size-4 mr-2" /> Add Visit
@@ -136,6 +153,20 @@ function PatientDetailPage() {
                     }}
                   >
                     <FileText className="size-3" /> Surat Sakit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 gap-1 px-2"
+                    onClick={() => {
+                      setActiveDiagnosis(v.final_diagnosis || "");
+                      setActiveAnamnesis(v.anamnesis || "");
+                      setActiveMedication(v.medication || "");
+                      setActivePhysicalExam(v.physical_exam || "");
+                      setReferralOpen(true);
+                    }}
+                  >
+                    <FileText className="size-3" /> Surat Rujukan
                   </Button>
                   <div className="text-sm text-muted-foreground">{formatIDR(v.tariff)}</div>
                 </div>
@@ -201,6 +232,15 @@ function PatientDetailPage() {
 
       <EditPatientDialog open={editing} onClose={() => setEditing(false)} patient={patient} onSaved={() => { setEditing(false); load(); }} />
       <SickLeaveDialog open={sickLeaveOpen} onClose={() => setSickLeaveOpen(false)} patient={patient} latestDiagnosis={activeDiagnosis} latestAnamnesis={activeAnamnesis} />
+      <ReferralLetterDialog
+        open={referralOpen}
+        onClose={() => setReferralOpen(false)}
+        patient={patient}
+        latestDiagnosis={activeDiagnosis}
+        latestAnamnesis={activeAnamnesis}
+        latestMedication={activeMedication}
+        latestPhysicalExam={activePhysicalExam}
+      />
     </div>
   );
 }
