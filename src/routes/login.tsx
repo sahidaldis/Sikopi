@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Stethoscope } from "lucide-react";
 import { toast } from "sonner";
+import logoUrl from "@/logo.png";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -54,11 +54,8 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary to-accent/40 p-4">
       <Card className="w-full max-w-md p-8 shadow-xl">
         <div className="flex flex-col items-center mb-8">
-          <div className="size-14 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center mb-3">
-            <Stethoscope className="size-7" />
-          </div>
-          <h1 className="text-2xl font-semibold tracking-tight">Clinic Management</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <img src={logoUrl} alt="SIKOPI Logo" className="w-64 h-auto object-contain mb-3" />
+          <p className="text-[11px] text-muted-foreground/80 mt-1 font-mono">
             {mode === "signin" ? "Sign in to continue" : "Create your admin account"}
           </p>
         </div>

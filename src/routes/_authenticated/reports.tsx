@@ -196,15 +196,17 @@ function ReportsPage() {
               </div>
             </Card>
             <Card className="p-5">
-              <Table>
-                <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Visits</TableHead><TableHead className="text-right">Revenue</TableHead></TableRow></TableHeader>
-                <TableBody>
-                  {byDay.map((d) => (
-                    <TableRow key={d.date}><TableCell>{d.date}</TableCell><TableCell>{d.visits}</TableCell><TableCell className="text-right">{formatIDR(d.revenue)}</TableCell></TableRow>
-                  ))}
-                  {byDay.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">No data.</TableCell></TableRow>}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Visits</TableHead><TableHead className="text-right">Revenue</TableHead></TableRow></TableHeader>
+                  <TableBody>
+                    {byDay.map((d) => (
+                      <TableRow key={d.date}><TableCell>{d.date}</TableCell><TableCell>{d.visits}</TableCell><TableCell className="text-right">{formatIDR(d.revenue)}</TableCell></TableRow>
+                    ))}
+                    {byDay.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">No data.</TableCell></TableRow>}
+                  </TableBody>
+                </Table>
+              </div>
             </Card>
           </TabsContent>
 
@@ -239,13 +241,15 @@ function ReportsPage() {
               </Card>
             </div>
             <Card className="p-5">
-              <Table>
-                <TableHeader><TableRow><TableHead>#</TableHead><TableHead>Diagnosis</TableHead><TableHead className="text-right">Count</TableHead></TableRow></TableHeader>
-                <TableBody>
-                  {diagnosisCount.map((d, i) => (<TableRow key={d.name}><TableCell>{i + 1}</TableCell><TableCell>{d.name}</TableCell><TableCell className="text-right">{d.count}</TableCell></TableRow>))}
-                  {diagnosisCount.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">No diagnoses recorded.</TableCell></TableRow>}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader><TableRow><TableHead>#</TableHead><TableHead>Diagnosis</TableHead><TableHead className="text-right">Count</TableHead></TableRow></TableHeader>
+                  <TableBody>
+                    {diagnosisCount.map((d, i) => (<TableRow key={d.name}><TableCell>{i + 1}</TableCell><TableCell>{d.name}</TableCell><TableCell className="text-right">{d.count}</TableCell></TableRow>))}
+                    {diagnosisCount.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">No diagnoses recorded.</TableCell></TableRow>}
+                  </TableBody>
+                </Table>
+              </div>
             </Card>
           </TabsContent>
 
@@ -311,13 +315,15 @@ function ReportsPage() {
               <KpiCard label="Transactions" value={String(visits.length)} />
             </div>
             <Card className="p-5">
-              <Table>
-                <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Visits</TableHead><TableHead className="text-right">Revenue</TableHead></TableRow></TableHeader>
-                <TableBody>
-                  {byDay.map((d) => (<TableRow key={d.date}><TableCell>{d.date}</TableCell><TableCell>{d.visits}</TableCell><TableCell className="text-right">{formatIDR(d.revenue)}</TableCell></TableRow>))}
-                  {byDay.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">No billing in period.</TableCell></TableRow>}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Visits</TableHead><TableHead className="text-right">Revenue</TableHead></TableRow></TableHeader>
+                  <TableBody>
+                    {byDay.map((d) => (<TableRow key={d.date}><TableCell>{d.date}</TableCell><TableCell>{d.visits}</TableCell><TableCell className="text-right">{formatIDR(d.revenue)}</TableCell></TableRow>))}
+                    {byDay.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">No billing in period.</TableCell></TableRow>}
+                  </TableBody>
+                </Table>
+              </div>
             </Card>
           </TabsContent>
         </Tabs>

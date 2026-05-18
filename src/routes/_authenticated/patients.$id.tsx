@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, Outlet, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Plus, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { SickLeaveDialog } from "@/components/clinic/SickLeaveDialog";
 import { ageFromDob, formatDate, formatDateTime, formatIDR } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/patients/$id")({
@@ -33,10 +34,16 @@ type Visit = {
 function PatientDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isChildRoute = location.pathname.endsWith("/visits/new");
+
   const [patient, setPatient] = useState<Patient | null>(null);
   const [visits, setVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [sickLeaveOpen, setSickLeaveOpen] = useState(false);
+  const [activeDiagnosis, setActiveDiagnosis] = useState("");
+  const [activeAnamnesis, setActiveAnamnesis] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -49,6 +56,8 @@ function PatientDetailPage() {
     setLoading(false);
   };
   useEffect(() => { load(); }, [id]);
+
+  if (isChildRoute) return <Outlet />;
 
   if (loading) return <div className="max-w-6xl mx-auto"><Skeleton className="h-40 w-full" /></div>;
   if (!patient) return <div className="max-w-6xl mx-auto"><p>Patient not found.</p><Link to="/patients" className="text-primary">Back to list</Link></div>;
@@ -80,9 +89,24 @@ function PatientDetailPage() {
               )}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button variant="outline" onClick={() => setEditing(true)}><Pencil className="size-4 mr-2" /> Edit</Button>
-            <Button onClick={() => navigate({ to: "/patients/$id/visits/new", params: { id } })}><Plus className="size-4 mr-2" /> Add Visit</Button>
+            <Button
+              variant="outline"
+              className="text-amber-600 border-amber-200 hover:bg-amber-50 hover:text-amber-700"
+              onClick={() => {
+                setActiveDiagnosis(visits[0]?.final_diagnosis || "");
+                setActiveAnamnesis(visits[0]?.anamnesis || "");
+                setSickLeaveOpen(true);
+              }}
+            >
+              <FileText className="size-4 mr-2" /> Surat Sakit
+            </Button>
+            <Button asChild>
+              <Link to="/patients/$id/visits/new" params={{ id }}>
+                <Plus className="size-4 mr-2" /> Add Visit
+              </Link>
+            </Button>
           </div>
         </div>
       </Card>
@@ -98,9 +122,23 @@ function PatientDetailPage() {
         <TabsContent value="timeline" className="space-y-3 mt-4">
           {visits.length === 0 ? <EmptyState text="No visits yet." /> : visits.map((v) => (
             <Card key={v.id} className="p-5">
-              <div className="flex justify-between mb-2">
+              <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
                 <div className="font-medium">{formatDateTime(v.visited_at)}</div>
-                <div className="text-sm text-muted-foreground">{formatIDR(v.tariff)}</div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 gap-1 px-2"
+                    onClick={() => {
+                      setActiveDiagnosis(v.final_diagnosis || "");
+                      setActiveAnamnesis(v.anamnesis || "");
+                      setSickLeaveOpen(true);
+                    }}
+                  >
+                    <FileText className="size-3" /> Surat Sakit
+                  </Button>
+                  <div className="text-sm text-muted-foreground">{formatIDR(v.tariff)}</div>
+                </div>
               </div>
               <div className="text-sm space-y-1">
                 {v.main_complaint && <div><b>Complaint:</b> {v.main_complaint}</div>}
@@ -162,6 +200,7 @@ function PatientDetailPage() {
       </Tabs>
 
       <EditPatientDialog open={editing} onClose={() => setEditing(false)} patient={patient} onSaved={() => { setEditing(false); load(); }} />
+      <SickLeaveDialog open={sickLeaveOpen} onClose={() => setSickLeaveOpen(false)} patient={patient} latestDiagnosis={activeDiagnosis} latestAnamnesis={activeAnamnesis} />
     </div>
   );
 }

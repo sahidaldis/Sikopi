@@ -20,8 +20,14 @@ export type VisitFieldsState = {
   tariff: string;
 };
 
+const getLocalDatetimeString = () => {
+  const now = new Date();
+  const offset = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - offset).toISOString().slice(0, 16);
+};
+
 export const emptyVisit = (): VisitFieldsState => ({
-  visited_at: new Date().toISOString().slice(0, 16),
+  visited_at: getLocalDatetimeString(),
   main_complaint: "",
   anamnesis: "",
   physical_exam: "",
@@ -54,10 +60,12 @@ export function VisitFields({
   state,
   set,
   startSection = 2,
+  allergySection,
 }: {
   state: VisitFieldsState;
   set: (patch: Partial<VisitFieldsState>) => void;
   startSection?: number;
+  allergySection?: React.ReactNode;
 }) {
   return (
     <>
@@ -77,6 +85,8 @@ export function VisitFields({
           <Textarea rows={3} value={state.anamnesis} onChange={(e) => set({ anamnesis: e.target.value })} />
         </div>
       </Section>
+
+      {allergySection}
 
       <Section num={startSection + 2} title="Physical Examination">
         <Textarea rows={5} value={state.physical_exam} onChange={(e) => set({ physical_exam: e.target.value })} />
@@ -105,16 +115,12 @@ export function VisitFields({
 
       <Section num={startSection + 4} title="Medication and Actions">
         <div>
-          <Label>Medication Therapy</Label>
-          <Textarea rows={3} value={state.medication} onChange={(e) => set({ medication: e.target.value })} />
+          <Label>Edukasi</Label>
+          <Textarea rows={3} value={state.instructions} onChange={(e) => set({ instructions: e.target.value })} />
         </div>
         <div>
-          <Label>Medical Actions / Procedures</Label>
-          <Textarea rows={2} value={state.procedures} onChange={(e) => set({ procedures: e.target.value })} />
-        </div>
-        <div>
-          <Label>Instructions</Label>
-          <Textarea rows={2} value={state.instructions} onChange={(e) => set({ instructions: e.target.value })} />
+          <Label>Medikasi</Label>
+          <Textarea rows={2} value={state.medication} onChange={(e) => set({ medication: e.target.value })} />
         </div>
       </Section>
 

@@ -121,20 +121,25 @@ function NewPatientPage() {
         </div>
       </Section>
 
-      <Section num={3} title="Allergy Information">
-        <RadioGroup value={p.allergy_flag} onValueChange={(v) => setP({ ...p, allergy_flag: v })} className="flex gap-6">
-          <label className="flex items-center gap-2"><RadioGroupItem value="no" /> No</label>
-          <label className="flex items-center gap-2"><RadioGroupItem value="yes" /> Yes</label>
-        </RadioGroup>
-        {p.allergy_flag === "yes" && (
-          <div>
-            <Label>Allergy Details</Label>
-            <Textarea rows={2} value={p.allergy_details} onChange={(e) => setP({ ...p, allergy_details: e.target.value })} />
-          </div>
-        )}
-      </Section>
-
-      <VisitFields state={v} set={(patch) => setV({ ...v, ...patch })} startSection={2} />
+      <VisitFields
+        state={v}
+        set={(patch) => setV({ ...v, ...patch })}
+        startSection={2}
+        allergySection={
+          <Section num={3} title="Allergy Information">
+            <RadioGroup value={p.allergy_flag} onValueChange={(v) => setP({ ...p, allergy_flag: v })} className="flex gap-6">
+              <label className="flex items-center gap-2"><RadioGroupItem value="no" /> No</label>
+              <label className="flex items-center gap-2"><RadioGroupItem value="yes" /> Yes</label>
+            </RadioGroup>
+            {p.allergy_flag === "yes" && (
+              <div>
+                <Label>Allergy Details</Label>
+                <Textarea rows={2} value={p.allergy_details} onChange={(e) => setP({ ...p, allergy_details: e.target.value })} />
+              </div>
+            )}
+          </Section>
+        }
+      />
 
       <div className="flex justify-end gap-3 sticky bottom-0 bg-background/80 backdrop-blur py-4 -mx-6 px-6 border-t">
         <Button type="button" variant="outline" onClick={() => navigate({ to: "/" })} disabled={busy}>Cancel</Button>

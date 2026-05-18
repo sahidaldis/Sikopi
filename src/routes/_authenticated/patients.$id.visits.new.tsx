@@ -53,7 +53,11 @@ function AddVisitPage() {
       <VisitFields state={v} set={(patch) => setV({ ...v, ...patch })} startSection={1} />
 
       <div className="flex justify-end gap-3 sticky bottom-0 bg-background/80 backdrop-blur py-4 -mx-6 px-6 border-t">
-        <Button type="button" variant="outline" onClick={() => navigate({ to: "/patients/$id", params: { id } })} disabled={busy}>Cancel</Button>
+        <Button type="button" variant="outline" asChild disabled={busy}>
+          <Link to="/patients/$id" params={{ id }}>
+            Cancel
+          </Link>
+        </Button>
         <Button type="submit" disabled={busy}>{busy ? "Saving…" : "Save Visit"}</Button>
       </div>
     </form>

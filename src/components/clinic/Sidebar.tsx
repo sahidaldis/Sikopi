@@ -1,8 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, BarChart3, Stethoscope, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
+import logoUrl from "@/logo.png";
 
 type Item = { to: "/" | "/patients" | "/reports"; label: string; icon: typeof LayoutDashboard; exact?: boolean };
 const items: Item[] = [
@@ -11,7 +12,7 @@ const items: Item[] = [
   { to: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
-export function ClinicSidebar() {
+export function ClinicSidebar({ onItemClick }: { onItemClick?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -20,15 +21,9 @@ export function ClinicSidebar() {
     exact ? path === to : path === to || path.startsWith(to + "/");
 
   return (
-    <aside className="sticky top-0 h-screen w-64 shrink-0 border-r bg-sidebar text-sidebar-foreground flex flex-col">
-      <div className="px-6 py-5 border-b flex items-center gap-3">
-        <div className="size-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
-          <Stethoscope className="size-5" />
-        </div>
-        <div>
-          <div className="text-sm font-semibold leading-tight">Clinic Suite</div>
-          <div className="text-xs text-muted-foreground">Private Practice</div>
-        </div>
+    <aside className="h-full w-full flex flex-col bg-sidebar text-sidebar-foreground">
+      <div className="px-6 py-4 border-b flex flex-col items-center justify-center">
+        <img src={logoUrl} alt="SIKOPI Logo" className="w-40 h-auto object-contain" />
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">
         {items.map(({ to, label, icon: Icon, exact }) => {
@@ -37,6 +32,7 @@ export function ClinicSidebar() {
             <Link
               key={to}
               to={to}
+              onClick={onItemClick}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 active
                   ? "bg-sidebar-primary text-sidebar-primary-foreground font-medium"
@@ -54,7 +50,7 @@ export function ClinicSidebar() {
         <Button
           variant="ghost"
           size="sm"
-          className="w-full justify-start"
+          className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
           onClick={async () => {
             await signOut();
             navigate({ to: "/login" });
