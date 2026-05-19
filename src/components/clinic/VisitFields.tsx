@@ -19,6 +19,7 @@ export type VisitFieldsState = {
   discharge_condition: string;
   followup: string;
   tariff: string;
+  nursing_implementation?: string;
 };
 
 const getLocalDatetimeString = () => {
@@ -43,6 +44,7 @@ export const emptyVisit = (): VisitFieldsState => ({
   discharge_condition: "",
   followup: "",
   tariff: "0",
+  nursing_implementation: "",
 });
 
 function Section({ title, num, children }: { title: string; num: number; children: React.ReactNode }) {
@@ -169,6 +171,68 @@ export function VisitFields({
       next.push(val.trim());
     }
     set({ planning: next.join(", ") });
+  };
+
+  // Parsing state.nursing_implementation for Nursing Implementation
+  const rawImplementation = state.nursing_implementation || "";
+
+  type ImplOption = { id: string; label: string; placeholder?: string };
+  const implOptions: ImplOption[] = [
+    { id: "vital", label: "Monitoring tanda vital" },
+    { id: "nyeri", label: "Mengkaji skala nyeri" },
+    { id: "mobilisasi", label: "Melakukan Edukasi mobilisasi", placeholder: "Contoh: Ankle Pump, Full Up setiap hari sekali" },
+    { id: "rom", label: "Mengajarkan Latihan ROM", placeholder: "Area yang dilatih..." },
+    { id: "luka", label: "Melakukan Perawatan luka", placeholder: "Detail perawatan..." },
+    { id: "cast_splint_rawat", label: "Melakukan Perawatan Cast / Splint", placeholder: "Detail perawatan..." },
+    { id: "kompres", label: "Melakukan Kompres dingin/hangat", placeholder: "Area kompres..." },
+    { id: "posisi", label: "Membantu dan memposisi pasien dengan nyaman", placeholder: "Posisi..." },
+    { id: "alat", label: "Memberikan Edukasi penggunaan alat bantu" },
+    { id: "obat", label: "Kolaborasi pembarian terapi obat" },
+    { id: "bandage", label: "Pemasangan Bandage" },
+    { id: "cast_splint_pasang", label: "Pemasangan Cast / Splint" },
+    { id: "jatuh", label: "Edukasi Pencegahan jatuh" },
+    { id: "keluarga", label: "Edukasi keluarga tentang", placeholder: "Topik edukasi..." },
+    { id: "lainnya", label: "Intervensi lainnya", placeholder: "Isi manual..." },
+  ];
+
+  const parsedImplementation = (() => {
+    const res: Record<string, { checked: boolean; text: string }> = {};
+    implOptions.forEach((opt) => (res[opt.id] = { checked: false, text: "" }));
+    
+    if (!rawImplementation) return res;
+    
+    const parts = rawImplementation.split(" | ");
+    parts.forEach((part) => {
+      for (const opt of implOptions) {
+        if (part.startsWith(opt.label)) {
+          res[opt.id].checked = true;
+          if (opt.placeholder !== undefined) {
+            let text = part.substring(opt.label.length).trim();
+            if (text.startsWith(":")) text = text.substring(1).trim();
+            res[opt.id].text = text;
+          }
+          break;
+        }
+      }
+    });
+    return res;
+  })();
+
+  const updateImplementation = (id: string, checked: boolean, text: string) => {
+    const current = { ...parsedImplementation };
+    current[id] = { checked, text };
+    
+    const parts: string[] = [];
+    implOptions.forEach((opt) => {
+      if (current[opt.id].checked) {
+        if (opt.placeholder !== undefined) {
+          parts.push(`${opt.label} : ${current[opt.id].text}`);
+        } else {
+          parts.push(opt.label);
+        }
+      }
+    });
+    set({ nursing_implementation: parts.join(" | ") });
   };
 
   // Parsing state.followup for Follow-up Instructions
@@ -463,6 +527,38 @@ export function VisitFields({
               </div>
             </div>
           </div>
+          <div className="md:col-span-2 border-t pt-4 mt-2">
+            <Label className="text-sm font-semibold mb-2 block text-primary">Nursing implementation ( Centang dan isi manual )</Label>
+            <div className="grid grid-cols-1 gap-3 p-4 rounded-xl border bg-muted/20">
+              {implOptions.map((opt) => {
+                const isChecked = parsedImplementation[opt.id].checked;
+                const textVal = parsedImplementation[opt.id].text;
+                return (
+                  <div key={opt.id} className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <label className="flex items-center gap-2.5 cursor-pointer text-sm sm:min-w-[350px]">
+                      <Checkbox
+                        checked={isChecked}
+                        onCheckedChange={(checked) => updateImplementation(opt.id, !!checked, textVal)}
+                      />
+                      <span className={opt.placeholder !== undefined ? "font-medium" : ""}>
+                        {opt.label} {opt.placeholder !== undefined ? ":" : ""}
+                      </span>
+                    </label>
+                    {opt.placeholder !== undefined && (
+                      <Input
+                        type="text"
+                        placeholder={opt.placeholder}
+                        value={textVal}
+                        onChange={(e) => updateImplementation(opt.id, isChecked, e.target.value)}
+                        disabled={!isChecked}
+                        className="flex-1"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </Section>
 
@@ -546,13 +642,18 @@ export async function persistVisit(opts: {
     .single();
   if (error) throw error;
 
+  const combinedPlanning = [
+    v.planning ? `[INTERVENSI]\n${v.planning}` : null,
+    v.nursing_implementation ? `[IMPLEMENTASI]\n${v.nursing_implementation.replace(/ \| /g, '\n')}` : null
+  ].filter(Boolean).join("\n\n");
+
   const [{ error: e1 }, { error: e2 }] = await Promise.all([
     supabase.from("cppt_records").insert({
       visit_id: visit.id,
       subjective: v.subjective || null,
       objective: v.objective || null,
       assessment: v.assessment || null,
-      planning: v.planning || null,
+      planning: combinedPlanning || null,
     }),
     supabase.from("billing").insert({ visit_id: visit.id, amount: tariff }),
   ]);
