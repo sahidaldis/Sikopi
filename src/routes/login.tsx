@@ -26,16 +26,15 @@ function LoginPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const res = await signIn(username, password);
-      if (res.success) {
+      const success = await signIn(username, password);
+      if (success) {
         toast.success("Selamat Datang Kembali");
         navigate({ to: "/" });
       } else {
-        toast.error(`Login gagal: ${res.error || "Username atau password salah"}`);
+        toast.error("Username atau password salah");
       }
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err?.message || "Terjadi kesalahan sistem");
+    } catch (err) {
+      toast.error("Terjadi kesalahan sistem");
     } finally {
       setBusy(false);
     }
