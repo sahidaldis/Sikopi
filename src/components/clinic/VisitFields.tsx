@@ -301,7 +301,7 @@ export function VisitFields({
             <div className="space-y-3 p-4 rounded-xl border bg-muted/20">
               {/* Laboratorium */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <label className="flex items-center gap-2.5 min-w-[160px] cursor-pointer text-sm">
+                <label className="flex items-center gap-2.5 sm:min-w-[230px] cursor-pointer text-sm">
                   <Checkbox
                     checked={parsedProcedures.labChecked}
                     onCheckedChange={(checked) => updateProcedureField("lab", !!checked, parsedProcedures.lab)}
@@ -320,7 +320,7 @@ export function VisitFields({
 
               {/* PA */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <label className="flex items-center gap-2.5 min-w-[160px] cursor-pointer text-sm">
+                <label className="flex items-center gap-2.5 sm:min-w-[230px] cursor-pointer text-sm">
                   <Checkbox
                     checked={parsedProcedures.paChecked}
                     onCheckedChange={(checked) => updateProcedureField("pa", !!checked, parsedProcedures.pa)}
@@ -339,7 +339,7 @@ export function VisitFields({
 
               {/* Radiologi */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <label className="flex items-center gap-2.5 min-w-[160px] cursor-pointer text-sm">
+                <label className="flex items-center gap-2.5 sm:min-w-[230px] cursor-pointer text-sm">
                   <Checkbox
                     checked={parsedProcedures.radChecked}
                     onCheckedChange={(checked) => updateProcedureField("rad", !!checked, parsedProcedures.rad)}
@@ -358,7 +358,7 @@ export function VisitFields({
 
               {/* Kultur */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <label className="flex items-center gap-2.5 min-w-[160px] cursor-pointer text-sm">
+                <label className="flex items-center gap-2.5 sm:min-w-[230px] cursor-pointer text-sm">
                   <Checkbox
                     checked={parsedProcedures.kulturChecked}
                     onCheckedChange={(checked) => updateProcedureField("kultur", !!checked, parsedProcedures.kultur)}
