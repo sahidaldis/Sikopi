@@ -727,7 +727,7 @@ export async function persistVisit(opts: {
     .from("visits")
     .insert({
       patient_id: opts.patient_id,
-      visited_at: new Date(v.visited_at).toISOString(),
+      visited_at: (v.visited_at && !isNaN(new Date(v.visited_at).getTime()) ? new Date(v.visited_at) : new Date()).toISOString(),
       main_complaint: v.main_complaint || null,
       anamnesis: v.anamnesis || null,
       physical_exam: v.physical_exam || null,

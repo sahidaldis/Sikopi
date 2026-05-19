@@ -31,10 +31,11 @@ function LoginPage() {
         toast.success("Selamat Datang Kembali");
         navigate({ to: "/" });
       } else {
-        toast.error("Username atau password salah");
+        toast.error("Username atau password salah. Pastikan akun sudah didaftarkan di Supabase.");
       }
-    } catch (err) {
-      toast.error("Terjadi kesalahan sistem");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Terjadi kesalahan sistem");
     } finally {
       setBusy(false);
     }

@@ -31,8 +31,9 @@ function AddVisitPage() {
       await persistVisit({ patient_id: id, state: v });
       toast.success("Visit saved");
       navigate({ to: "/patients/$id", params: { id } });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Save failed");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || (typeof err === "string" ? err : "Save failed"));
     } finally {
       setBusy(false);
     }
