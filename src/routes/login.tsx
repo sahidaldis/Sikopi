@@ -15,7 +15,7 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const { session, loading, signIn } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -26,15 +26,16 @@ function LoginPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const success = await signIn(username, password);
-      if (success) {
+      const res = await signIn(email, password);
+      if (res.success) {
         toast.success("Selamat Datang Kembali");
         navigate({ to: "/" });
       } else {
-        toast.error("Username atau password salah");
+        toast.error(`Login gagal: ${res.error || "Email atau password salah"}`);
       }
-    } catch (err) {
-      toast.error("Terjadi kesalahan sistem");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Terjadi kesalahan sistem");
     } finally {
       setBusy(false);
     }
@@ -51,15 +52,15 @@ function LoginPage() {
         </div>
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Masukkan username"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Masukkan email"
               required
-              autoComplete="username"
+              autoComplete="email"
             />
           </div>
           <div className="space-y-2">
