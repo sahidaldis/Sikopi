@@ -338,7 +338,7 @@ export function VisitFields({
           <Textarea rows={2} value={state.main_complaint} onChange={(e) => set({ main_complaint: e.target.value })} />
         </div>
         <div>
-          <Label>Anamnesis / Medical History</Label>
+          <Label>Riwayat Kesehatan</Label>
           <Textarea rows={3} value={state.anamnesis} onChange={(e) => set({ anamnesis: e.target.value })} />
         </div>
       </Section>
