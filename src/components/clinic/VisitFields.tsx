@@ -2,6 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MedicationPicker } from "@/components/clinic/MedicationPicker";
 
 export type VisitFieldsState = {
   visited_at: string;
@@ -628,10 +629,10 @@ export function VisitFields({
           <Label>Edukasi</Label>
           <Textarea rows={3} value={state.instructions} onChange={(e) => set({ instructions: e.target.value })} />
         </div>
-        <div>
-          <Label>Medikasi</Label>
-          <Textarea rows={2} value={state.medication} onChange={(e) => set({ medication: e.target.value })} />
-        </div>
+        <MedicationPicker
+          value={state.medication}
+          onChange={(val) => set({ medication: val })}
+        />
       </Section>
 
       <Section num={startSection + 5} title="Medical Resume / Discharge Summary">
