@@ -117,6 +117,60 @@ export function VisitFields({
     set({ assessment: next.join(", ") });
   };
 
+  // Parsing state.planning for Nursing Interventions
+  const parsedInterventions = state.planning
+    ? state.planning.split(", ").map((i) => i.trim()).filter(Boolean)
+    : [];
+
+  const standardInterventions = [
+    "Monitor tanda vital",
+    "Kaji skala nyeri",
+    "Edukasi mobilisasi",
+    "Latihan ROM",
+    "Perawatan luka",
+    "Perawatan Cast / Splint",
+    "Kompres dingin/hangat",
+    "Posisi nyaman",
+    "Edukasi penggunaan alat bantu",
+    "Kolaborasi terapi obat",
+    "Pasang Bandage",
+    "Pasang Cast / Splint",
+    "Pencegahan jatuh",
+    "Edukasi keluarga"
+  ];
+
+  const customIntervention = parsedInterventions.find((i) => !standardInterventions.includes(i)) || "";
+
+  const handleInterventionToggle = (interv: string, checked: boolean) => {
+    let next = [...parsedInterventions];
+    if (checked) {
+      if (!next.includes(interv)) {
+        next.push(interv);
+      }
+    } else {
+      next = next.filter((i) => i !== interv);
+    }
+    
+    const sorted: string[] = [];
+    standardInterventions.forEach((i) => {
+      if (next.includes(i)) sorted.push(i);
+    });
+    const customInNext = next.find((i) => !standardInterventions.includes(i));
+    if (customInNext) {
+      sorted.push(customInNext);
+    }
+
+    set({ planning: sorted.join(", ") });
+  };
+
+  const handleCustomInterventionChange = (val: string) => {
+    let next = parsedInterventions.filter((i) => standardInterventions.includes(i));
+    if (val.trim()) {
+      next.push(val.trim());
+    }
+    set({ planning: next.join(", ") });
+  };
+
   // Parsing state.followup for Follow-up Instructions
   const parsedFollowups = state.followup
     ? state.followup.split(", ").map((f) => f.trim()).filter(Boolean)
@@ -366,9 +420,48 @@ export function VisitFields({
               </div>
             </div>
           </div>
-          <div className="md:col-span-2">
-            <Label>Planning (P)</Label>
-            <Textarea rows={3} value={state.planning} onChange={(e) => set({ planning: e.target.value })} />
+          <div className="md:col-span-2 border-t pt-4 mt-2">
+            <Label className="text-sm font-semibold mb-2 block text-primary">Nursing Intervention</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border bg-muted/20">
+              {standardInterventions.map((interv) => {
+                const isChecked = parsedInterventions.includes(interv);
+                return (
+                  <label
+                    key={interv}
+                    className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors text-sm"
+                  >
+                    <Checkbox
+                      checked={isChecked}
+                      onCheckedChange={(checked) => handleInterventionToggle(interv, !!checked)}
+                      className="mt-0.5"
+                    />
+                    <span>{interv}</span>
+                  </label>
+                );
+              })}
+              <div className="sm:col-span-2 border-t pt-3 mt-1 flex flex-col gap-2">
+                <label className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors text-sm">
+                  <Checkbox
+                    checked={!!customIntervention}
+                    onCheckedChange={(checked) => {
+                      if (!checked) {
+                        handleCustomInterventionChange("");
+                      } else {
+                        handleCustomInterventionChange("Intervensi lainnya");
+                      }
+                    }}
+                  />
+                  <span>Intervensi lainnya :</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Tulis intervensi manual lainnya..."
+                  value={customIntervention === "Intervensi lainnya" ? "" : customIntervention}
+                  onChange={(e) => handleCustomInterventionChange(e.target.value)}
+                  className="ml-8 w-full max-w-md"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </Section>
