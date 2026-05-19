@@ -20,6 +20,8 @@ export type VisitFieldsState = {
   followup: string;
   tariff: string;
   nursing_implementation?: string;
+  evaluation?: string;
+  evaluation_date?: string;
 };
 
 const getLocalDatetimeString = () => {
@@ -45,6 +47,8 @@ export const emptyVisit = (): VisitFieldsState => ({
   followup: "",
   tariff: "0",
   nursing_implementation: "",
+  evaluation: "",
+  evaluation_date: "",
 });
 
 function Section({ title, num, children }: { title: string; num: number; children: React.ReactNode }) {
@@ -64,11 +68,13 @@ export function VisitFields({
   set,
   startSection = 2,
   allergySection,
+  showEvaluation = false,
 }: {
   state: VisitFieldsState;
   set: (patch: Partial<VisitFieldsState>) => void;
   startSection?: number;
   allergySection?: React.ReactNode;
+  showEvaluation?: boolean;
 }) {
   const parsedDiagnoses = state.assessment
     ? state.assessment.split(", ").map((d) => d.trim()).filter(Boolean)
@@ -233,6 +239,61 @@ export function VisitFields({
       }
     });
     set({ nursing_implementation: parts.join(" | ") });
+  };
+
+  // Parsing state.evaluation
+  const rawEvaluation = state.evaluation || "";
+  const evalOptions = [
+    "Nyeri menurun",
+    "Mobilitas membaik",
+    "Luka membaik",
+    "Tidak ada tanda infeksi",
+    "Pasien memahami edukasi",
+    "Kondisi stabil",
+    "Keluhan masih ada"
+  ];
+  
+  const parsedEvaluation = (() => {
+    const res: Record<string, boolean> = {};
+    evalOptions.forEach(opt => res[opt] = false);
+    let note = "";
+    
+    if (!rawEvaluation) return { checked: res, note };
+    
+    const parts = rawEvaluation.split(" | ");
+    parts.forEach(part => {
+      if (part.startsWith("Catatan tambahan:")) {
+        note = part.substring("Catatan tambahan:".length).trim();
+      } else if (evalOptions.includes(part)) {
+        res[part] = true;
+      }
+    });
+    return { checked: res, note };
+  })();
+
+  const updateEvaluation = (opt: string, checked: boolean) => {
+    const current = { ...parsedEvaluation.checked };
+    current[opt] = checked;
+    
+    const parts: string[] = [];
+    evalOptions.forEach(o => {
+      if (current[o]) parts.push(o);
+    });
+    if (parsedEvaluation.note) {
+      parts.push(`Catatan tambahan: ${parsedEvaluation.note}`);
+    }
+    set({ evaluation: parts.join(" | ") });
+  };
+
+  const updateEvaluationNote = (val: string) => {
+    const parts: string[] = [];
+    evalOptions.forEach(o => {
+      if (parsedEvaluation.checked[o]) parts.push(o);
+    });
+    if (val.trim()) {
+      parts.push(`Catatan tambahan: ${val.trim()}`);
+    }
+    set({ evaluation: parts.join(" | ") });
   };
 
   // Parsing state.followup for Follow-up Instructions
@@ -605,7 +666,47 @@ export function VisitFields({
         </div>
       </Section>
 
-      <Section num={startSection + 6} title="Billing">
+      {showEvaluation && (
+        <Section num={startSection + 6} title="Evaluation (diisi saat control berikutnya)">
+          <div className="space-y-4">
+            <div className="max-w-xs">
+              <Label className="mb-2 block text-sm font-semibold">Tanggal Evaluasi / Kontrol Berikutnya</Label>
+              <Input type="date" value={state.evaluation_date || ""} onChange={(e) => set({ evaluation_date: e.target.value })} />
+            </div>
+            
+            <div>
+              <Label className="text-sm font-semibold mb-2 block">Kriteria Evaluasi</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border bg-muted/20">
+                {evalOptions.map((opt) => (
+                  <label
+                    key={opt}
+                    className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors text-sm"
+                  >
+                    <Checkbox
+                      checked={parsedEvaluation.checked[opt]}
+                      onCheckedChange={(checked) => updateEvaluation(opt, !!checked)}
+                      className="mt-0.5"
+                    />
+                    <span>{opt}</span>
+                  </label>
+                ))}
+                
+                <div className="sm:col-span-2 border-t pt-3 mt-1 flex flex-col gap-2">
+                  <Label>Catatan tambahan : (Isi manual)</Label>
+                  <Textarea
+                    rows={2}
+                    placeholder="Tulis catatan evaluasi lainnya..."
+                    value={parsedEvaluation.note}
+                    onChange={(e) => updateEvaluationNote(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Section>
+      )}
+
+      <Section num={startSection + (showEvaluation ? 7 : 6)} title="Billing">
         <div className="max-w-xs">
           <Label>Manual Tariff (IDR)</Label>
           <Input type="number" min="0" step="1000" value={state.tariff} onChange={(e) => set({ tariff: e.target.value })} />
@@ -644,7 +745,8 @@ export async function persistVisit(opts: {
 
   const combinedPlanning = [
     v.planning ? `[INTERVENSI]\n${v.planning}` : null,
-    v.nursing_implementation ? `[IMPLEMENTASI]\n${v.nursing_implementation.replace(/ \| /g, '\n')}` : null
+    v.nursing_implementation ? `[IMPLEMENTASI]\n${v.nursing_implementation.replace(/ \| /g, '\n')}` : null,
+    (v.evaluation || v.evaluation_date) ? `[EVALUASI]\n${v.evaluation_date ? `Tanggal: ${v.evaluation_date}\n` : ''}${v.evaluation ? v.evaluation.replace(/ \| /g, '\n') : ''}` : null
   ].filter(Boolean).join("\n\n");
 
   const [{ error: e1 }, { error: e2 }] = await Promise.all([

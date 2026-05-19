@@ -50,7 +50,7 @@ function AddVisitPage() {
 
       <Card className="p-4 text-sm text-muted-foreground">Recording a new examination for an existing patient.</Card>
 
-      <VisitFields state={v} set={(patch) => setV({ ...v, ...patch })} startSection={1} />
+      <VisitFields state={v} set={(patch) => setV({ ...v, ...patch })} startSection={1} showEvaluation={true} />
 
       <div className="flex justify-end gap-3 sticky bottom-0 bg-background/80 backdrop-blur py-4 -mx-6 px-6 border-t">
         <Button type="button" variant="outline" asChild disabled={busy}>
