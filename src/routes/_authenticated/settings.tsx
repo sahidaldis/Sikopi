@@ -49,7 +49,7 @@ function SettingsPage() {
       // If newPassword is empty, we only update the username and keep the old password
       const activePassword = newPassword || localStorage.getItem("sikopi_password") || "admin";
       updateCredentials(username.trim(), activePassword);
-      
+
       toast.success("Pengaturan akun berhasil diperbarui!");
       // Clear password fields after success
       setNewPassword("");
@@ -64,7 +64,7 @@ function SettingsPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight">Pengaturan Sistem</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Pengaturan Sikopi</h1>
         <p className="text-sm text-muted-foreground">
           Kelola kredensial login asisten atau admin untuk mengakses aplikasi SIKOPI secara offline.
         </p>
