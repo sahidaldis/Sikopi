@@ -528,7 +528,7 @@ export function VisitFields({
             </div>
           </div>
           <div className="md:col-span-2 border-t pt-4 mt-2">
-            <Label className="text-sm font-semibold mb-2 block text-primary">Nursing implementation ( Centang dan isi manual )</Label>
+            <Label className="text-sm font-semibold mb-2 block text-primary">Nursing Implementation</Label>
             <div className="grid grid-cols-1 gap-3 p-4 rounded-xl border bg-muted/20">
               {implOptions.map((opt) => {
                 const isChecked = parsedImplementation[opt.id].checked;
