@@ -26,12 +26,12 @@ function LoginPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const success = await signIn(username, password);
-      if (success) {
+      const res = await signIn(username, password);
+      if (res.success) {
         toast.success("Selamat Datang Kembali");
         navigate({ to: "/" });
       } else {
-        toast.error("Username atau password salah. Pastikan akun sudah didaftarkan di Supabase.");
+        toast.error(`Login gagal: ${res.error || "Username atau password salah"}`);
       }
     } catch (err: any) {
       console.error(err);

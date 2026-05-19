@@ -14,7 +14,7 @@ type AuthCtx = {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
-  signIn: (username: string, password: string) => Promise<boolean>;
+  signIn: (username: string, password: string) => Promise<{success: boolean, error?: string}>;
   updateCredentials: (username: string, password: string) => Promise<void>;
 };
 
@@ -23,7 +23,7 @@ const Ctx = createContext<AuthCtx>({
   user: null,
   loading: true,
   signOut: async () => {},
-  signIn: async () => false,
+  signIn: async () => ({success: false, error: "Not initialized"}),
   updateCredentials: async () => {},
 });
 
@@ -46,14 +46,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (username: string, password: string): Promise<boolean> => {
+  const signIn = async (username: string, password: string): Promise<{success: boolean, error?: string}> => {
     const email = toEmail(username);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       console.error("[Auth] signIn error:", error.message);
-      return false;
+      return { success: false, error: error.message };
     }
-    return true;
+    return { success: true };
   };
 
   const signOut = async () => {
