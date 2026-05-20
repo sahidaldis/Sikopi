@@ -315,26 +315,26 @@ export function ReferralLetterDialog({
                 <div className="space-y-1.5 mt-6 text-[12pt] leading-tight">
                   <div className="flex items-start gap-2">
                     <p className="font-semibold underline shrink-0">Keluhan & Anamnesa Singkat:</p>
-                    <p className="italic line-clamp-1">{anamnesis || "—"}</p>
+                    <p className="italic">{anamnesis || "—"}</p>
                   </div>
                   {physicalExam && (
                     <div className="flex items-start gap-2">
                       <p className="font-semibold underline shrink-0">Pemeriksaan Fisik / Tanda-Tanda Vital:</p>
-                      <p className="line-clamp-1">{physicalExam}</p>
+                      <p>{physicalExam}</p>
                     </div>
                   )}
                   <div className="flex items-start gap-2">
                     <p className="font-semibold underline shrink-0">Diagnosis Keperawatan Rujukan:</p>
-                    <p className="font-medium line-clamp-1">{diagnosis || "—"}</p>
+                    <p className="font-medium">{diagnosis || "—"}</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <p className="font-semibold underline shrink-0">Diagnosis Medis Sementara / Suspect:</p>
-                    <p className="font-medium line-clamp-1">{medicalDiagnosis || "—"}</p>
+                    <p className="font-medium">{medicalDiagnosis || "—"}</p>
                   </div>
                   {therapy && (
                     <div className="flex items-start gap-2">
                       <p className="font-semibold underline shrink-0">Terapi / Tindakan Sementara yang Diberikan:</p>
-                      <p className="line-clamp-1">{therapy}</p>
+                      <p>{therapy}</p>
                     </div>
                   )}
                   <div className="flex items-end gap-2">
