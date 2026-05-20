@@ -128,13 +128,13 @@ function NewPatientPage() {
               </SelectContent>
             </Select>
           </div>
-          <div className="md:col-span-2">
-            <Label>Address</Label>
-            <Textarea rows={2} value={p.address} onChange={(e) => setP({ ...p, address: e.target.value })} />
-          </div>
           <div>
             <Label>Phone Number</Label>
             <Input value={p.phone} onChange={(e) => setP({ ...p, phone: e.target.value })} />
+          </div>
+          <div className="md:col-span-2">
+            <Label>Address</Label>
+            <Textarea rows={2} value={p.address} onChange={(e) => setP({ ...p, address: e.target.value })} />
           </div>
         </div>
       </Section>

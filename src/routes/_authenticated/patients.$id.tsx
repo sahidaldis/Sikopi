@@ -265,7 +265,6 @@ function EditPatientDialog({ open, onClose, patient, onSaved }: { open: boolean;
               </SelectContent>
             </Select>
           </div>
-          <div><Label>Phone</Label><Input value={form.phone ?? ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
           <div>
             <Label>Pendidikan Terakhir</Label>
             <Select value={form.education ?? ""} onValueChange={(val) => setForm({ ...form, education: val })}>
@@ -281,6 +280,7 @@ function EditPatientDialog({ open, onClose, patient, onSaved }: { open: boolean;
               </SelectContent>
             </Select>
           </div>
+          <div><Label>Phone Number</Label><Input value={form.phone ?? ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
           <div className="md:col-span-2"><Label>Address</Label><Textarea rows={2} value={form.address ?? ""} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
           <div className="md:col-span-2 flex items-center gap-2">
             <input type="checkbox" id="allergy" checked={form.allergy_flag} onChange={(e) => setForm({ ...form, allergy_flag: e.target.checked })} />

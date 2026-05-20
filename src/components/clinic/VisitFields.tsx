@@ -107,7 +107,7 @@ export function VisitFields({
     } else {
       next = next.filter((d) => d !== diag);
     }
-    
+
     const sorted: string[] = [];
     standardDiagnoses.forEach((d) => {
       if (next.includes(d)) sorted.push(d);
@@ -162,7 +162,7 @@ export function VisitFields({
     } else {
       next = next.filter((i) => i !== interv);
     }
-    
+
     const sorted: string[] = [];
     standardInterventions.forEach((i) => {
       if (next.includes(i)) sorted.push(i);
@@ -208,13 +208,13 @@ export function VisitFields({
   ];
 
   const parsedImplementation = (() => {
-    const res: Record<string, { checked: boolean; text: string; vitals?: {t: string, n: string, r: string, s: string}; subSelections?: string[] }> = {};
+    const res: Record<string, { checked: boolean; text: string; vitals?: { t: string, n: string, r: string, s: string }; subSelections?: string[] }> = {};
     implOptions.forEach((opt) => {
-      res[opt.id] = { checked: false, text: "", vitals: opt.id === "vital" ? {t: "", n: "", r: "", s: ""} : undefined, subSelections: opt.subOptions ? [] : undefined };
+      res[opt.id] = { checked: false, text: "", vitals: opt.id === "vital" ? { t: "", n: "", r: "", s: "" } : undefined, subSelections: opt.subOptions ? [] : undefined };
     });
-    
+
     if (!rawImplementation) return res;
-    
+
     const parts = rawImplementation.split(" | ");
     parts.forEach((part) => {
       for (const opt of implOptions) {
@@ -224,11 +224,11 @@ export function VisitFields({
             let text = part.substring(opt.label.length).trim();
             if (text.startsWith(":")) text = text.substring(1).trim();
             res[opt.id].text = text;
-            
+
             if (opt.subOptions) {
               res[opt.id].subSelections = text.split(",").map(s => s.trim()).filter(Boolean);
             }
-            
+
             if (opt.id === "vital") {
               const tMatch = text.match(/T:\s*(.*?)(?=\s*mmHg)/);
               const nMatch = text.match(/N:\s*(.*?)(?=\s*x\/Menit)/);
@@ -252,7 +252,7 @@ export function VisitFields({
   const updateImplementation = (id: string, checked: boolean, text: string, currentItemsObj?: any) => {
     const current = currentItemsObj || { ...parsedImplementation };
     current[id] = { ...current[id], checked, text };
-    
+
     const parts: string[] = [];
     implOptions.forEach((opt) => {
       if (current[opt.id].checked) {
@@ -276,27 +276,27 @@ export function VisitFields({
     }
     const newText = currentSubs.join(", ");
     currentObj[id].subSelections = currentSubs;
-    
+
     let newParentChecked = parentChecked;
     if (isChecked && !parentChecked) {
       newParentChecked = true;
     }
-    
+
     updateImplementation(id, newParentChecked, newText, currentObj);
   };
 
-  const updateVital = (field: 't'|'n'|'r'|'s', val: string, isChecked: boolean) => {
-    const v = { ...(parsedImplementation["vital"].vitals || {t: "", n: "", r: "", s: ""}) };
+  const updateVital = (field: 't' | 'n' | 'r' | 's', val: string, isChecked: boolean) => {
+    const v = { ...(parsedImplementation["vital"].vitals || { t: "", n: "", r: "", s: "" }) };
     v[field] = val;
-    
+
     let textParts = [];
     if (v.t) textParts.push(`T: ${v.t} mmHg`);
     if (v.n) textParts.push(`N: ${v.n} x/Menit`);
     if (v.r) textParts.push(`R: ${v.r} x/Menit`);
     if (v.s) textParts.push(`S: ${v.s} oC`);
-    
+
     const text = textParts.join("  ");
-    
+
     const current = { ...parsedImplementation };
     current["vital"] = { checked: isChecked, text, vitals: v };
     updateImplementation("vital", isChecked, text, current);
@@ -314,14 +314,14 @@ export function VisitFields({
     { id: "stabil", label: "Kondisi stabil" },
     { id: "keluhan", label: "Keluhan masih ada" }
   ];
-  
+
   const parsedEvaluation = (() => {
     const res: Record<string, { checked: boolean; text: string }> = {};
     evalOptions.forEach(opt => res[opt.id] = { checked: false, text: "" });
     let note = "";
-    
+
     if (!rawEvaluation) return { items: res, note };
-    
+
     const parts = rawEvaluation.split(" | ");
     parts.forEach(part => {
       if (part.startsWith("Catatan tambahan:")) {
@@ -346,7 +346,7 @@ export function VisitFields({
   const updateEvaluation = (id: string, checked: boolean, text: string) => {
     const currentItems = { ...parsedEvaluation.items };
     currentItems[id] = { checked, text };
-    
+
     const parts: string[] = [];
     evalOptions.forEach(o => {
       if (currentItems[o.id].checked) {
@@ -402,7 +402,7 @@ export function VisitFields({
     } else {
       next = next.filter((f) => f !== opt);
     }
-    
+
     // Maintain standard order
     const sorted: string[] = [];
     followupOptions.forEach((f) => {
@@ -417,16 +417,16 @@ export function VisitFields({
   const parsedProcedures = (() => {
     const res = { lab: "", pa: "", rad: "", kultur: "", labChecked: false, paChecked: false, radChecked: false, kulturChecked: false };
     if (!rawProcedures) return res;
-    
+
     const parts = rawProcedures.split(" | ");
     parts.forEach((part) => {
       const idx = part.indexOf(":");
       if (idx === -1) return;
       const key = part.slice(0, idx).trim();
       const val = part.slice(idx + 1).trim();
-      
+
       const cleanVal = val === "—" ? "" : val;
-      
+
       if (key === "Laboratorium") {
         res.lab = cleanVal;
         res.labChecked = true;
@@ -465,7 +465,7 @@ export function VisitFields({
     if (current.paChecked) parts.push(`PA: ${current.pa.trim() || "—"}`);
     if (current.radChecked) parts.push(`Radiologi: ${current.rad.trim() || "—"}`);
     if (current.kulturChecked) parts.push(`Kultur: ${current.kultur.trim() || "—"}`);
-    
+
     set({ procedures: parts.join(" | ") });
   };
 
@@ -480,7 +480,7 @@ export function VisitFields({
         </div>
         <div>
           <Label>Main Complaint</Label>
-          <Textarea rows={2} value={state.main_complaint} onChange={(e) => set({ main_complaint: e.target.value })} />
+          <Textarea rows={2} value={state.main_complaint} onChange={(e) => set({ main_complaint: e.target.value, subjective: e.target.value })} />
         </div>
         <div>
           <Label>Riwayat Kesehatan</Label>
@@ -491,7 +491,7 @@ export function VisitFields({
       {allergySection}
 
       <Section num={startSection + 2} title="Physical Examination">
-        <Textarea rows={5} value={state.physical_exam} onChange={(e) => set({ physical_exam: e.target.value })} />
+        <Textarea rows={5} value={state.physical_exam} onChange={(e) => set({ physical_exam: e.target.value, objective: e.target.value })} />
       </Section>
 
       <Section num={startSection + 3} title="Nursing Care Plan">
@@ -780,7 +780,7 @@ export function VisitFields({
         />
       </Section>
 
-      <Section num={startSection + 5} title="Medical Resume / Discharge Summary">
+      <Section num={startSection + 5} title="Nursing Resume / Discharge Summary">
         <div>
           <Label>Medical Diagnosis</Label>
           <Input value={state.final_diagnosis} onChange={(e) => set({ final_diagnosis: e.target.value })} />
@@ -823,7 +823,7 @@ export function VisitFields({
               <Label className="mb-2 block text-sm font-semibold">Tanggal Evaluasi / Kontrol Berikutnya</Label>
               <Input type="date" value={state.evaluation_date || ""} onChange={(e) => set({ evaluation_date: e.target.value })} />
             </div>
-            
+
             <div>
               <Label className="text-sm font-semibold mb-2 block">Kriteria Evaluasi</Label>
               <div className="grid grid-cols-1 gap-3 p-4 rounded-xl border bg-muted/20">
@@ -854,7 +854,7 @@ export function VisitFields({
                     </div>
                   );
                 })}
-                
+
                 <div className="border-t pt-3 mt-1 flex flex-col gap-2">
                   <Label>Catatan tambahan : (Isi manual)</Label>
                   <Textarea
