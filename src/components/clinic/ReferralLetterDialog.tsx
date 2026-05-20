@@ -105,7 +105,8 @@ export function ReferralLetterDialog({
               font-family: 'Times New Roman', Times, serif;
               background: white;
               color: black;
-              padding: 2cm;
+              margin: 0;
+              padding: 0;
               box-sizing: border-box;
             }
             .font-sans {
@@ -117,10 +118,8 @@ export function ReferralLetterDialog({
             }
           </style>
         </head>
-        <body class="bg-white">
-          <div class="w-[210mm] min-h-[297mm] mx-auto text-[12pt] p-8">
-            ${printContent.innerHTML}
-          </div>
+        <body class="bg-white m-0 p-0">
+          ${printContent.outerHTML}
           <script>
             window.onload = function() {
               setTimeout(function() {
