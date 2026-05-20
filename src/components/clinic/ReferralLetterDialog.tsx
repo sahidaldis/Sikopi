@@ -58,6 +58,7 @@ export function ReferralLetterDialog({
   const [targetHospital, setTargetHospital] = useState("Rumah Sakit Umum Daerah");
   const [targetSpecialty, setTargetSpecialty] = useState("Spesialis Bedah / Orthopedi");
   const [diagnosis, setDiagnosis] = useState(latestDiagnosis);
+  const [medicalDiagnosis, setMedicalDiagnosis] = useState("");
   const [anamnesis, setAnamnesis] = useState(latestAnamnesis);
   const [therapy, setTherapy] = useState(latestMedication);
   const [physicalExam, setPhysicalExam] = useState(latestPhysicalExam);
@@ -70,7 +71,7 @@ export function ReferralLetterDialog({
     setPhysicalExam(latestPhysicalExam);
   });
 
-  const doctorName = "PARYANTO, S.Kep., Ns.";
+  const doctorName = "Paryanto, S.Kep., Ns. MM";
   const sipNumber = "500.16.7.2/361/2024";
   const age = getAgeFromDob(patient.dob);
 
@@ -95,16 +96,15 @@ export function ReferralLetterDialog({
           <title>Surat Rujukan Pasien - ${patient.full_name}</title>
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300;400;500;600;700&display=swap');
             body {
-              font-family: 'Playfair Display', Georgia, serif;
+              font-family: 'Times New Roman', Times, serif;
               background: white;
               color: black;
-              padding: 1.5cm;
+              padding: 2cm;
               box-sizing: border-box;
             }
             .font-sans {
-              font-family: 'Inter', system-ui, sans-serif;
+              font-family: Arial, Helvetica, sans-serif !important;
             }
             @page {
               size: A4;
@@ -113,15 +113,17 @@ export function ReferralLetterDialog({
           </style>
         </head>
         <body class="bg-white">
-          <div class="max-w-2xl mx-auto">
+          <div class="w-[210mm] min-h-[297mm] mx-auto text-[12pt] p-8">
             ${printContent.innerHTML}
           </div>
           <script>
             window.onload = function() {
-              window.print();
               setTimeout(function() {
-                window.parent.document.body.removeChild(window.frameElement);
-              }, 1000);
+                window.print();
+                setTimeout(function() {
+                  window.parent.document.body.removeChild(window.frameElement);
+                }, 1000);
+              }, 500);
             }
           </script>
         </body>
@@ -134,7 +136,7 @@ export function ReferralLetterDialog({
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-5xl max-h-[95vh] flex flex-col md:flex-row gap-6 overflow-hidden">
         {/* Form Controls */}
-        <div className="flex-1 space-y-4 overflow-y-auto pr-2 flex flex-col justify-between max-h-[85vh]">
+        <div className="w-full md:w-1/3 space-y-4 overflow-y-auto pr-2 flex flex-col justify-between max-h-[85vh]">
           <div className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold">Buat Surat Rujukan Pasien</DialogTitle>
@@ -143,7 +145,7 @@ export function ReferralLetterDialog({
             <div className="p-3 rounded-lg bg-primary/5 border border-primary/10 text-xs text-primary space-y-1">
               <p className="font-semibold">Informasi Dokter & Klinik (Otomatis):</p>
               <p>Pemberi Rujukan: <span className="font-medium text-foreground">{doctorName}</span></p>
-              <p>SIP: <span className="font-medium text-foreground">{sipNumber}</span></p>
+              <p>SIPP: <span className="font-medium text-foreground">{sipNumber}</span></p>
             </div>
 
             <div className="space-y-3 text-sm">
@@ -195,13 +197,24 @@ export function ReferralLetterDialog({
               </div>
 
               <div>
-                <Label htmlFor="diagnosis" className="font-semibold text-foreground">Diagnosis Rujukan (Sementara)</Label>
+                <Label htmlFor="diagnosis" className="font-semibold text-foreground">Diagnosis Keperawatan Rujukan</Label>
                 <Input
                   id="diagnosis"
                   value={diagnosis}
                   onChange={(e) => setDiagnosis(e.target.value)}
                   className="mt-1 text-xs"
-                  placeholder="Diagnosis utama"
+                  placeholder="Diagnosis keperawatan utama"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="medical_diagnosis" className="font-semibold text-foreground">Diagnosis Medis Sementara/Suspect</Label>
+                <Input
+                  id="medical_diagnosis"
+                  value={medicalDiagnosis}
+                  onChange={(e) => setMedicalDiagnosis(e.target.value)}
+                  className="mt-1 text-xs"
+                  placeholder="Diagnosis medis"
                 />
               </div>
 
@@ -226,113 +239,122 @@ export function ReferralLetterDialog({
         </div>
 
         {/* Live Preview Pane */}
-        <div className="flex-1 bg-muted p-4 rounded-lg overflow-y-auto hidden md:block max-h-[85vh]">
-          <div className="text-xs text-muted-foreground mb-2 text-center uppercase tracking-wider font-semibold">Live Preview Surat Rujukan</div>
+        <div className="flex-1 bg-muted p-4 rounded-lg overflow-auto hidden md:block max-h-[85vh]">
+          <div className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold sticky top-0 bg-muted/80 backdrop-blur z-10 py-2">Live Preview Surat Rujukan</div>
           
-          <div id="printable-referral-letter" className="bg-white text-black p-8 font-serif shadow-md border rounded text-[10px] aspect-[1/1.41] flex flex-col justify-between">
-            <div>
-              {/* Kop Surat (Header) */}
-              <div className="flex items-center gap-4 border-b-2 border-black pb-2 mb-4">
-                <img src={ppniLogoUrl} alt="PPNI Logo" className="h-12 w-12 sm:h-14 sm:w-14 object-contain shrink-0" />
-                <div className="flex-1 text-center pr-12 font-serif">
-                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wide">PRAKTIK KEPERAWATAN</h2>
-                  <p className="text-[8px] leading-tight text-gray-700">Klegen Rt. 002 Rw. 015, Planggu, Trucuk - Klaten</p>
-                </div>
-              </div>
-
-              {/* Tempat & Tanggal Rujukan */}
-              <div className="flex justify-between items-start mb-4 text-[9px]">
-                <div className="space-y-0.5">
-                  <p>Hal : <b>Rujukan Pasien</b></p>
-                  <p>Lampiran : —</p>
-                </div>
-                <div className="text-right">
-                  <p>Klaten, {formatIndonesianDate(new Date())}</p>
-                </div>
-              </div>
-
-              {/* Penerima Rujukan */}
-              <div className="mb-4 text-[9px] leading-relaxed">
-                <p>Kepada Yth.</p>
-                <p className="font-bold">Teman Sejawat Dokter {targetSpecialty || "—"}</p>
-                <p>Di <span className="font-semibold">{targetHospital || "—"}</span></p>
-              </div>
-
-              <p className="mb-3 text-[9px]">Dengan hormat,</p>
-              <p className="mb-3 text-[9px] leading-relaxed">
-                Mohon pemeriksaan dan penanganan lebih lanjut terhadap pasien di bawah ini:
-              </p>
-
-              {/* Data Pasien */}
-              <table className="w-full ml-2 text-[9px] my-3 border-collapse leading-relaxed">
-                <tbody>
-                  <tr className="h-4">
-                    <td className="w-24 align-top">Nama Pasien</td>
-                    <td className="w-3 align-top">:</td>
-                    <td className="font-bold uppercase align-top">{patient.full_name}</td>
-                  </tr>
-                  <tr className="h-4">
-                    <td className="align-top">Umur / Tgl Lahir</td>
-                    <td className="align-top">:</td>
-                    <td className="align-top">
-                      {age !== null ? `${age} Tahun` : "—"} / {formatIndonesianDate(patient.dob)}
-                    </td>
-                  </tr>
-                  <tr className="h-4">
-                    <td className="align-top">Jenis Kelamin</td>
-                    <td className="align-top">:</td>
-                    <td className="align-top">{patient.gender || "—"}</td>
-                  </tr>
-                  <tr className="h-4">
-                    <td className="align-top">No. Rekam Medis</td>
-                    <td className="align-top">:</td>
-                    <td className="align-top font-mono text-[8px]">{patient.mrn}</td>
-                  </tr>
-                  <tr className="h-4">
-                    <td className="align-top">Alamat Pasien</td>
-                    <td className="align-top">:</td>
-                    <td className="align-top">{patient.address || "—"}</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              {/* Temuan Klinis & Rencana */}
-              <div className="space-y-2 mt-4 text-[9px] leading-relaxed">
-                <div>
-                  <p className="font-semibold underline">Keluhan & Anamnesa Singkat:</p>
-                  <p className="pl-2 text-gray-700 italic">{anamnesis || "—"}</p>
-                </div>
-                {physicalExam && (
-                  <div>
-                    <p className="font-semibold underline">Pemeriksaan Fisik / Tanda-Tanda Vital:</p>
-                    <p className="pl-2 text-gray-700">{physicalExam}</p>
+          <div className="flex justify-center origin-top" style={{ transform: 'scale(0.85)' }}>
+            <div id="printable-referral-letter" className="bg-white text-black p-12 shadow-xl border w-[210mm] min-h-[297mm] flex flex-col" style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '12pt' }}>
+              <div>
+                {/* Kop Surat (Header) */}
+                <div className="flex items-center gap-6 border-b-[3px] border-black pb-4 mb-6">
+                  <img src={ppniLogoUrl} alt="PPNI Logo" className="h-24 w-24 object-contain shrink-0" />
+                  <div className="flex-1 text-left font-sans">
+                    <h2 className="text-[16pt] font-bold uppercase tracking-wide mb-1 text-black font-sans">PRAKTIK MANDIRI PERAWAT</h2>
+                    <p className="text-[11pt] leading-snug text-black font-sans">Dusun Klegen 02/XV, Desa Planggu, Kecamatan Trucuk, Kabupaten Klaten</p>
+                    <p className="text-[11pt] leading-snug text-black font-sans">Mobile Phone Number : 0857 4196 5020</p>
                   </div>
-                )}
-                <div>
-                  <p className="font-semibold underline">Diagnosis Keperawatan Rujukan:</p>
-                  <p className="pl-2 text-gray-800 font-medium">{diagnosis || "—"}</p>
                 </div>
-                {therapy && (
-                  <div>
-                    <p className="font-semibold underline">Terapi / Tindakan Sementara yang Diberikan:</p>
-                    <p className="pl-2 text-gray-700">{therapy}</p>
+
+                {/* Tempat & Tanggal Rujukan */}
+                <div className="flex justify-between items-start mb-6 text-[12pt]">
+                  <div className="space-y-0.5">
+                    <p>Hal : <b>Rujukan Pasien</b></p>
+                    <p>Lampiran : —</p>
                   </div>
-                )}
+                  <div className="text-right">
+                    <p>Trucuk, {formatIndonesianDate(new Date())}</p>
+                  </div>
+                </div>
+
+                {/* Penerima Rujukan */}
+                <div className="mb-6 text-[12pt] leading-relaxed">
+                  <p>Kepada Yth.</p>
+                  <p className="font-bold">Dokter {targetSpecialty || "—"}</p>
+                  <p>Di <span className="font-semibold">{targetHospital || "—"}</span></p>
+                </div>
+
+                <p className="mb-3 text-[12pt]">Dengan hormat,</p>
+                <p className="mb-4 text-[12pt] leading-relaxed">
+                  Mohon pemeriksaan dan penanganan lebih lanjut terhadap pasien di bawah ini:
+                </p>
+
+                {/* Data Pasien */}
+                <table className="w-full ml-4 text-[12pt] my-4 border-collapse leading-relaxed">
+                  <tbody>
+                    <tr className="h-6">
+                      <td className="w-40 align-top">Nama Pasien</td>
+                      <td className="w-4 align-top">:</td>
+                      <td className="font-bold uppercase align-top">{patient.full_name}</td>
+                    </tr>
+                    <tr className="h-6">
+                      <td className="align-top">Umur / Tgl Lahir</td>
+                      <td className="align-top">:</td>
+                      <td className="align-top">
+                        {age !== null ? `${age} Tahun` : "—"} / {formatIndonesianDate(patient.dob)}
+                      </td>
+                    </tr>
+                    <tr className="h-6">
+                      <td className="align-top">Jenis Kelamin</td>
+                      <td className="align-top">:</td>
+                      <td className="align-top">{patient.gender === 'male' ? 'Laki-laki' : patient.gender === 'female' ? 'Perempuan' : patient.gender || '—'}</td>
+                    </tr>
+                    <tr className="h-6">
+                      <td className="align-top">No. Rekam Medis</td>
+                      <td className="align-top">:</td>
+                      <td className="align-top font-mono">{patient.mrn}</td>
+                    </tr>
+                    <tr className="h-6">
+                      <td className="align-top">Alamat Pasien</td>
+                      <td className="align-top">:</td>
+                      <td className="align-top">{patient.address || "—"}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                {/* Temuan Klinis & Rencana */}
+                <div className="space-y-4 mt-6 text-[12pt] leading-relaxed">
+                  <div>
+                    <p className="font-semibold underline">Keluhan & Anamnesa Singkat:</p>
+                    <p className="pl-4 italic">{anamnesis || "—"}</p>
+                  </div>
+                  {physicalExam && (
+                    <div>
+                      <p className="font-semibold underline">Pemeriksaan Fisik / Tanda-Tanda Vital:</p>
+                      <p className="pl-4">{physicalExam}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-semibold underline">Diagnosis Keperawatan Rujukan:</p>
+                    <p className="pl-4 font-medium">{diagnosis || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold underline">Diagnosis Medis Sementara/Suspect:</p>
+                    <p className="pl-4 font-medium">{medicalDiagnosis || "—"}</p>
+                  </div>
+                  {therapy && (
+                    <div>
+                      <p className="font-semibold underline">Terapi / Tindakan Sementara yang Diberikan:</p>
+                      <p className="pl-4">{therapy}</p>
+                    </div>
+                  )}
+                </div>
+
+                <p className="mt-8 text-[12pt] leading-relaxed">
+                  Demikian surat rujukan ini kami buat untuk penanganan medis pasien lebih lanjut. Atas kerja sama dan bantuan sejawat, kami ucapkan terima kasih.
+                </p>
               </div>
 
-              <p className="mt-4 text-[9px] leading-relaxed">
-                Demikian surat rujukan ini kami buat untuk penanganan medis pasien lebih lanjut. Atas kerja sama dan bantuan sejawat, kami ucapkan terima kasih.
-              </p>
-            </div>
-
-            {/* Tanda Tangan */}
-            <div className="mt-8 flex justify-between items-start text-[9px]">
-              <div></div>
-              <div className="text-center w-52 space-y-12">
-                <p>Salam Sejawat,<br />Perawat Pemeriksa,</p>
-                <div>
-                  <p className="font-bold underline uppercase">{doctorName}</p>
-                  <p className="text-[8px] text-gray-500">SIP. {sipNumber}</p>
+              {/* Tanda Tangan */}
+              <div className="mt-16 flex justify-end text-[12pt]">
+                <div className="text-left w-64 space-y-20">
+                  <div>
+                    <p>Salam Sejawat,</p>
+                    <p className="mt-2">Perawat Pemeriksa,</p>
+                  </div>
+                  <div>
+                    <p className="font-bold underline">{doctorName}</p>
+                    <p>SIPP : {sipNumber}</p>
+                  </div>
                 </div>
               </div>
             </div>

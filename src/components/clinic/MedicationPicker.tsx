@@ -22,7 +22,7 @@ const DRUG_LIST = [
   "Hufadin", "Hufamag plus", "Infalgin 500 mg", "Intunal F", "Laxana 5 mg",
   "Lerzin", "Linogra 100 mg", "Loperamid Hcl 2 mg", "Lostacef 500",
   "Mecobalamin 500 mg", "Mefinal 500 mg", "Megatic Salf", "Neprholit",
-  "Neuralgin 500 mg", "Neurodex", "Neurpyron 500 mg", "Nexitra 500 mg",
+  "Neuralgin 500 mg", "Neurodex", "Neuropyron 500 mg", "Nexitra 500 mg",
   "Nifedipine 5 mg", "Norvom 10 mg", "Novabiotic 500 mg", "Omeprazole 20 mg",
   "Oraprofen Syrup", "Remafar 10 mg", "Renabetic 5 mg", "Samcorbex C",
   "Samcovask 10 mg", "Sanorine Obat Kumur", "Seremig 10 mg",
