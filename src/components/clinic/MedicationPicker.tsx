@@ -38,7 +38,7 @@ const FREQ_OPTIONS = [
 ];
 
 const TIMING_OPTIONS = [
-  "Sesudah Makan", "Sebelum Makan", "Saat Makan"
+  "Sesudah Makan", "Sebelum Makan"
 ];
 
 // ── Storage format: "DrugName || freq || timing" ──────────────────
