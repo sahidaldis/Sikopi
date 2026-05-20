@@ -241,7 +241,7 @@ export function ReferralLetterDialog({
         {/* Live Preview Pane */}
         <div className="flex-1 bg-muted p-4 rounded-lg overflow-auto hidden md:block max-h-[85vh]">
           <div className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold sticky top-0 bg-muted/80 backdrop-blur z-10 py-2">Live Preview Surat Rujukan</div>
-          
+
           <div className="flex justify-center origin-top" style={{ transform: 'scale(0.85)' }}>
             <div id="printable-referral-letter" className="bg-white text-black p-12 shadow-xl border w-[210mm] min-h-[297mm] flex flex-col" style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '12pt' }}>
               <div>
@@ -328,7 +328,7 @@ export function ReferralLetterDialog({
                     <p className="pl-4 font-medium">{diagnosis || "—"}</p>
                   </div>
                   <div>
-                    <p className="font-semibold underline">Diagnosis Medis Sementara/Suspect:</p>
+                    <p className="font-semibold underline">Diagnosis Medis Sementara / Suspect:</p>
                     <p className="pl-4 font-medium">{medicalDiagnosis || "—"}</p>
                   </div>
                   {therapy && (

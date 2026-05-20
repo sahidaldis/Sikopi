@@ -38,6 +38,7 @@ function NewPatientPage() {
     gender: "",
     address: "",
     phone: "",
+    education: "",
     allergy_flag: "no",
     allergy_details: "",
   });
@@ -57,6 +58,7 @@ function NewPatientPage() {
           gender: p.gender || null,
           address: p.address || null,
           phone: p.phone || null,
+          education: p.education || null,
           allergy_flag: p.allergy_flag === "yes",
           allergy_details: p.allergy_flag === "yes" ? p.allergy_details || null : null,
         })
@@ -106,8 +108,23 @@ function NewPatientPage() {
             <Select value={p.gender} onValueChange={(val) => setP({ ...p, gender: val })}>
               <SelectTrigger><SelectValue placeholder="Select gender" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Laki-Laki">Laki-Laki</SelectItem>
+                <SelectItem value="Perempuan">Perempuan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Pendidikan Terakhir</Label>
+            <Select value={p.education} onValueChange={(val) => setP({ ...p, education: val })}>
+              <SelectTrigger><SelectValue placeholder="Pilih pendidikan" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="TK">TK</SelectItem>
+                <SelectItem value="SD">SD</SelectItem>
+                <SelectItem value="SMP">SMP</SelectItem>
+                <SelectItem value="SMA/SMK">SMA/SMK</SelectItem>
+                <SelectItem value="Diploma">Diploma</SelectItem>
+                <SelectItem value="Sarjana">Sarjana</SelectItem>
+                <SelectItem value="Lain-lain">Lain-lain</SelectItem>
               </SelectContent>
             </Select>
           </div>

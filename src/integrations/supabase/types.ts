@@ -88,6 +88,7 @@ export type Database = {
           allergy_flag: boolean
           created_at: string
           dob: string | null
+          education: string | null
           full_name: string
           gender: string | null
           id: string
@@ -102,6 +103,7 @@ export type Database = {
           allergy_flag?: boolean
           created_at?: string
           dob?: string | null
+          education?: string | null
           full_name: string
           gender?: string | null
           id?: string
@@ -116,6 +118,7 @@ export type Database = {
           allergy_flag?: boolean
           created_at?: string
           dob?: string | null
+          education?: string | null
           full_name?: string
           gender?: string | null
           id?: string
@@ -132,6 +135,7 @@ export type Database = {
           created_at: string
           discharge_condition: string | null
           final_diagnosis: string | null
+          main_nursing_diagnosis: string | null
           followup: string | null
           id: string
           instructions: string | null
@@ -148,6 +152,7 @@ export type Database = {
           created_at?: string
           discharge_condition?: string | null
           final_diagnosis?: string | null
+          main_nursing_diagnosis?: string | null
           followup?: string | null
           id?: string
           instructions?: string | null
@@ -164,6 +169,7 @@ export type Database = {
           created_at?: string
           discharge_condition?: string | null
           final_diagnosis?: string | null
+          main_nursing_diagnosis?: string | null
           followup?: string | null
           id?: string
           instructions?: string | null

@@ -23,6 +23,7 @@ export type VisitFieldsState = {
   nursing_implementation?: string;
   evaluation?: string;
   evaluation_date?: string;
+  main_nursing_diagnosis?: string;
 };
 
 const getLocalDatetimeString = () => {
@@ -50,6 +51,7 @@ export const emptyVisit = (): VisitFieldsState => ({
   nursing_implementation: "",
   evaluation: "",
   evaluation_date: "",
+  main_nursing_diagnosis: "",
 });
 
 function Section({ title, num, children }: { title: string; num: number; children: React.ReactNode }) {
@@ -784,6 +786,10 @@ export function VisitFields({
           <Input value={state.final_diagnosis} onChange={(e) => set({ final_diagnosis: e.target.value })} />
         </div>
         <div>
+          <Label>Main Nursing Diagnosis</Label>
+          <Input value={state.main_nursing_diagnosis || ""} onChange={(e) => set({ main_nursing_diagnosis: e.target.value })} />
+        </div>
+        <div>
           <Label>Patient Condition at Discharge</Label>
           <Input value={state.discharge_condition} onChange={(e) => set({ discharge_condition: e.target.value })} />
         </div>
@@ -893,6 +899,7 @@ export async function persistVisit(opts: {
       procedures: v.procedures || null,
       instructions: v.instructions || null,
       final_diagnosis: v.final_diagnosis || null,
+      main_nursing_diagnosis: v.main_nursing_diagnosis || null,
       discharge_condition: v.discharge_condition || null,
       followup: v.followup || null,
       tariff,

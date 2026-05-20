@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Plus, Pencil, FileText } from "lucide-react";
 import { toast } from "sonner";
@@ -22,12 +23,12 @@ export const Route = createFileRoute("/_authenticated/patients/$id")({
 type Patient = {
   id: string; mrn: string; full_name: string; national_id: string | null;
   dob: string | null; gender: string | null; address: string | null;
-  phone: string | null; allergy_flag: boolean; allergy_details: string | null;
+  phone: string | null; education: string | null; allergy_flag: boolean; allergy_details: string | null;
 };
 type Visit = {
   id: string; visited_at: string; main_complaint: string | null; anamnesis: string | null;
   physical_exam: string | null; medication: string | null; procedures: string | null;
-  instructions: string | null; final_diagnosis: string | null; discharge_condition: string | null;
+  instructions: string | null; final_diagnosis: string | null; main_nursing_diagnosis: string | null; discharge_condition: string | null;
   followup: string | null; tariff: number;
   cppt_records: { subjective: string | null; objective: string | null; assessment: string | null; planning: string | null } | { subjective: string | null; objective: string | null; assessment: string | null; planning: string | null }[] | null;
 };
@@ -85,6 +86,7 @@ function PatientDetailPage() {
               <div>DOB: <span className="text-foreground">{formatDate(patient.dob)}{age !== null ? ` (${age} yrs)` : ""}</span></div>
               <div>Phone: <span className="text-foreground">{patient.phone ?? "—"}</span></div>
               <div>National ID: <span className="text-foreground">{patient.national_id ?? "—"}</span></div>
+              <div>Education: <span className="text-foreground">{patient.education ?? "—"}</span></div>
               <div className="sm:col-span-2">Address: <span className="text-foreground">{patient.address ?? "—"}</span></div>
               {patient.allergy_flag && (
                 <div className="sm:col-span-2 mt-2 rounded-md bg-destructive/10 text-destructive px-3 py-2 text-sm">
@@ -146,6 +148,7 @@ function PatientDetailPage() {
               <div className="text-sm space-y-1">
                 {v.main_complaint && <div><b>Complaint:</b> {v.main_complaint}</div>}
                 {v.final_diagnosis && <div><b>Diagnosis:</b> {v.final_diagnosis}</div>}
+                {v.main_nursing_diagnosis && <div><b>Nursing Diagnosis:</b> {v.main_nursing_diagnosis}</div>}
                 {v.physical_exam && <div><b>Exam:</b> <span className="text-muted-foreground">{v.physical_exam}</span></div>}
                 {v.medication && <div><b>Medication:</b> {v.medication}</div>}
                 {v.followup && <div><b>Follow-up:</b> {v.followup}</div>}
@@ -235,6 +238,7 @@ function EditPatientDialog({ open, onClose, patient, onSaved }: { open: boolean;
       gender: form.gender || null,
       address: form.address || null,
       phone: form.phone || null,
+      education: form.education || null,
       allergy_flag: form.allergy_flag,
       allergy_details: form.allergy_flag ? form.allergy_details : null,
     }).eq("id", patient.id);
@@ -251,8 +255,32 @@ function EditPatientDialog({ open, onClose, patient, onSaved }: { open: boolean;
           <div><Label>Full Name</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
           <div><Label>National ID</Label><Input value={form.national_id ?? ""} onChange={(e) => setForm({ ...form, national_id: e.target.value })} /></div>
           <div><Label>Date of Birth</Label><Input type="date" value={form.dob ?? ""} onChange={(e) => setForm({ ...form, dob: e.target.value })} /></div>
-          <div><Label>Gender</Label><Input value={form.gender ?? ""} onChange={(e) => setForm({ ...form, gender: e.target.value })} /></div>
+          <div>
+            <Label>Gender</Label>
+            <Select value={form.gender ?? ""} onValueChange={(val) => setForm({ ...form, gender: val })}>
+              <SelectTrigger><SelectValue placeholder="Select gender" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Laki-Laki">Laki-Laki</SelectItem>
+                <SelectItem value="Perempuan">Perempuan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div><Label>Phone</Label><Input value={form.phone ?? ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+          <div>
+            <Label>Pendidikan Terakhir</Label>
+            <Select value={form.education ?? ""} onValueChange={(val) => setForm({ ...form, education: val })}>
+              <SelectTrigger><SelectValue placeholder="Pilih pendidikan" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="TK">TK</SelectItem>
+                <SelectItem value="SD">SD</SelectItem>
+                <SelectItem value="SMP">SMP</SelectItem>
+                <SelectItem value="SMA/SMK">SMA/SMK</SelectItem>
+                <SelectItem value="Diploma">Diploma</SelectItem>
+                <SelectItem value="Sarjana">Sarjana</SelectItem>
+                <SelectItem value="Lain-lain">Lain-lain</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="md:col-span-2"><Label>Address</Label><Textarea rows={2} value={form.address ?? ""} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
           <div className="md:col-span-2 flex items-center gap-2">
             <input type="checkbox" id="allergy" checked={form.allergy_flag} onChange={(e) => setForm({ ...form, allergy_flag: e.target.checked })} />
