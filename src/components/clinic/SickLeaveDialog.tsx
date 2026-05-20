@@ -200,7 +200,7 @@ export function SickLeaveDialog({
           <div className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold sticky top-0 bg-muted/80 backdrop-blur z-10 py-2">Live Preview Surat</div>
           
           <div className="flex justify-center origin-top" style={{ transform: 'scale(0.85)' }}>
-            <div id="printable-sick-leave" className="bg-white text-black p-12 shadow-xl border w-[210mm] min-h-[297mm] flex flex-col" style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '12pt' }}>
+            <div id="printable-sick-leave" className="bg-white text-black p-10 shadow-xl border w-[210mm] min-h-[297mm] flex flex-col justify-between" style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '12pt' }}>
               <div>
                 {/* Kop Surat (Header) */}
                 <div className="flex items-center gap-6 border-b-[3px] border-black pb-4 mb-6">
@@ -224,37 +224,37 @@ export function SickLeaveDialog({
 
                   <table className="w-full ml-8 my-4 border-collapse">
                     <tbody>
-                      <tr className="h-8">
+                      <tr className="h-7">
                         <td className="w-40 align-top">Nama</td>
                         <td className="w-4 align-top">:</td>
                         <td className="align-top">{patient.full_name}</td>
                       </tr>
-                      <tr className="h-8">
+                      <tr className="h-7">
                         <td className="align-top">Jenis Kelamin</td>
                         <td className="align-top">:</td>
                         <td className="align-top">{patient.gender?.toLowerCase() === 'male' ? 'Laki-Laki' : patient.gender?.toLowerCase() === 'female' ? 'Perempuan' : patient.gender || '—'}</td>
                       </tr>
-                      <tr className="h-8">
+                      <tr className="h-7">
                         <td className="align-top">Umur</td>
                         <td className="align-top">:</td>
                         <td className="align-top">{age !== null ? `${age} Tahun` : "—"}</td>
                       </tr>
-                      <tr className="h-8">
+                      <tr className="h-7">
                         <td className="align-top">Pekerjaan</td>
                         <td className="align-top">:</td>
                         <td className="align-top">—</td>
                       </tr>
-                      <tr className="h-8">
+                      <tr className="h-7">
                         <td className="align-top">Alamat</td>
                         <td className="align-top">:</td>
                         <td className="align-top">{patient.address || "—"}</td>
                       </tr>
-                      <tr className="h-8">
+                      <tr className="h-7">
                         <td className="align-top">Anamnese</td>
                         <td className="align-top">:</td>
                         <td className="align-top">{latestAnamnesis || "—"}</td>
                       </tr>
-                      <tr className="h-8">
+                      <tr className="h-7">
                         <td className="align-top">Dx. Keperawatan</td>
                         <td className="align-top">:</td>
                         <td className="align-top">{latestDiagnosis || "—"}</td>
@@ -271,8 +271,8 @@ export function SickLeaveDialog({
               </div>
 
               {/* Tanda Tangan */}
-              <div className="mt-16 flex justify-end text-[12pt]">
-                <div className="text-left w-64 space-y-20">
+              <div className="mt-10 flex justify-end text-[12pt] break-inside-avoid">
+                <div className="text-left w-64 space-y-16">
                   <div>
                     <p>Trucuk, {formatIndonesianDate(new Date())}</p>
                     <p className="mt-2">Perawat Pemeriksa,</p>
