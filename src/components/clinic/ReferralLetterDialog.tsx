@@ -22,6 +22,7 @@ type ReferralLetterDialogProps = {
   latestAnamnesis?: string;
   latestMedication?: string;
   latestPhysicalExam?: string;
+  latestMedicalDiagnosis?: string;
 };
 
 const formatIndonesianDate = (dateStr: string | Date | null) => {
@@ -54,11 +55,12 @@ export function ReferralLetterDialog({
   latestAnamnesis = "",
   latestMedication = "",
   latestPhysicalExam = "",
+  latestMedicalDiagnosis = "",
 }: ReferralLetterDialogProps) {
   const [targetHospital, setTargetHospital] = useState("Rumah Sakit Umum Daerah");
   const [targetSpecialty, setTargetSpecialty] = useState("Spesialis Bedah / Orthopedi");
   const [diagnosis, setDiagnosis] = useState(latestDiagnosis);
-  const [medicalDiagnosis, setMedicalDiagnosis] = useState("");
+  const [medicalDiagnosis, setMedicalDiagnosis] = useState(latestMedicalDiagnosis);
   const [anamnesis, setAnamnesis] = useState(latestAnamnesis);
   const [therapy, setTherapy] = useState(latestMedication);
   const [physicalExam, setPhysicalExam] = useState(latestPhysicalExam);
@@ -69,6 +71,7 @@ export function ReferralLetterDialog({
     setAnamnesis(latestAnamnesis);
     setTherapy(latestMedication);
     setPhysicalExam(latestPhysicalExam);
+    setMedicalDiagnosis(latestMedicalDiagnosis);
   });
 
   const doctorName = "Paryanto, S.Kep., Ns. MM";
@@ -296,7 +299,7 @@ export function ReferralLetterDialog({
                     <tr className="h-6">
                       <td className="align-top">Jenis Kelamin</td>
                       <td className="align-top">:</td>
-                      <td className="align-top">{patient.gender === 'male' ? 'Laki-laki' : patient.gender === 'female' ? 'Perempuan' : patient.gender || '—'}</td>
+                      <td className="align-top">{patient.gender?.toLowerCase() === 'male' ? 'Laki-Laki' : patient.gender?.toLowerCase() === 'female' ? 'Perempuan' : patient.gender || '—'}</td>
                     </tr>
                     <tr className="h-6">
                       <td className="align-top">No. Rekam Medis</td>

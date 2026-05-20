@@ -49,6 +49,7 @@ function PatientDetailPage() {
   const [activeAnamnesis, setActiveAnamnesis] = useState("");
   const [activeMedication, setActiveMedication] = useState("");
   const [activePhysicalExam, setActivePhysicalExam] = useState("");
+  const [activeMedicalDiagnosis, setActiveMedicalDiagnosis] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -112,8 +113,9 @@ function PatientDetailPage() {
               variant="outline"
               className="text-indigo-600 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
               onClick={() => {
-                setActiveDiagnosis(visits[0]?.final_diagnosis || "");
-                setActiveAnamnesis(visits[0]?.anamnesis || "");
+                setActiveDiagnosis(visits[0]?.main_nursing_diagnosis || "");
+                setActiveAnamnesis(visits[0]?.main_complaint || "");
+                setActiveMedicalDiagnosis(visits[0]?.final_diagnosis || "");
                 setActiveMedication(visits[0]?.medication || "");
                 setActivePhysicalExam(visits[0]?.physical_exam || "");
                 setReferralOpen(true);
@@ -215,6 +217,7 @@ function PatientDetailPage() {
         latestAnamnesis={activeAnamnesis}
         latestMedication={activeMedication}
         latestPhysicalExam={activePhysicalExam}
+        latestMedicalDiagnosis={activeMedicalDiagnosis}
       />
     </div>
   );

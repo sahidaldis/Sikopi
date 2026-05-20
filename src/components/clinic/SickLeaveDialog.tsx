@@ -232,7 +232,7 @@ export function SickLeaveDialog({
                       <tr className="h-8">
                         <td className="align-top">Jenis Kelamin</td>
                         <td className="align-top">:</td>
-                        <td className="align-top">{patient.gender === 'male' ? 'Laki-laki' : patient.gender === 'female' ? 'Perempuan' : patient.gender || '—'}</td>
+                        <td className="align-top">{patient.gender?.toLowerCase() === 'male' ? 'Laki-Laki' : patient.gender?.toLowerCase() === 'female' ? 'Perempuan' : patient.gender || '—'}</td>
                       </tr>
                       <tr className="h-8">
                         <td className="align-top">Umur</td>

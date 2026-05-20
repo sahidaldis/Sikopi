@@ -127,7 +127,7 @@ function PatientsListPage() {
                   <TableRow key={r.id}>
                     <TableCell className="font-mono text-xs">{r.mrn}</TableCell>
                     <TableCell className="font-medium">{r.full_name}</TableCell>
-                    <TableCell>{r.gender ?? "—"}</TableCell>
+                    <TableCell>{r.gender?.toLowerCase() === 'male' ? 'Laki-Laki' : r.gender?.toLowerCase() === 'female' ? 'Perempuan' : r.gender || "—"}</TableCell>
                     <TableCell>{r.phone ?? "—"}</TableCell>
                     <TableCell>{formatDate(r.last_visit)}</TableCell>
                     <TableCell className="text-right space-x-1">
