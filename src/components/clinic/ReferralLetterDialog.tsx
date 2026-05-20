@@ -260,11 +260,7 @@ export function ReferralLetterDialog({
                 </div>
 
                 {/* Tempat & Tanggal Rujukan */}
-                <div className="flex justify-between items-start mb-6 text-[12pt]">
-                  <div className="space-y-0.5">
-                    <p>Hal : <b>Rujukan Pasien</b></p>
-                    <p>Lampiran : —</p>
-                  </div>
+                <div className="flex justify-end items-start mb-6 text-[12pt]">
                   <div className="text-right">
                     <p>Trucuk, {formatIndonesianDate(new Date())}</p>
                   </div>
@@ -316,31 +312,35 @@ export function ReferralLetterDialog({
                 </table>
 
                 {/* Temuan Klinis & Rencana */}
-                <div className="space-y-4 mt-6 text-[12pt] leading-relaxed">
-                  <div>
-                    <p className="font-semibold underline">Keluhan & Anamnesa Singkat:</p>
-                    <p className="pl-4 italic">{anamnesis || "—"}</p>
+                <div className="space-y-1.5 mt-6 text-[12pt] leading-tight">
+                  <div className="flex items-start gap-2">
+                    <p className="font-semibold underline shrink-0">Keluhan & Anamnesa Singkat:</p>
+                    <p className="italic line-clamp-1">{anamnesis || "—"}</p>
                   </div>
                   {physicalExam && (
-                    <div>
-                      <p className="font-semibold underline">Pemeriksaan Fisik / Tanda-Tanda Vital:</p>
-                      <p className="pl-4">{physicalExam}</p>
+                    <div className="flex items-start gap-2">
+                      <p className="font-semibold underline shrink-0">Pemeriksaan Fisik / Tanda-Tanda Vital:</p>
+                      <p className="line-clamp-1">{physicalExam}</p>
                     </div>
                   )}
-                  <div>
-                    <p className="font-semibold underline">Diagnosis Keperawatan Rujukan:</p>
-                    <p className="pl-4 font-medium">{diagnosis || "—"}</p>
+                  <div className="flex items-start gap-2">
+                    <p className="font-semibold underline shrink-0">Diagnosis Keperawatan Rujukan:</p>
+                    <p className="font-medium line-clamp-1">{diagnosis || "—"}</p>
                   </div>
-                  <div>
-                    <p className="font-semibold underline">Diagnosis Medis Sementara / Suspect:</p>
-                    <p className="pl-4 font-medium">{medicalDiagnosis || "—"}</p>
+                  <div className="flex items-start gap-2">
+                    <p className="font-semibold underline shrink-0">Diagnosis Medis Sementara / Suspect:</p>
+                    <p className="font-medium line-clamp-1">{medicalDiagnosis || "—"}</p>
                   </div>
                   {therapy && (
-                    <div>
-                      <p className="font-semibold underline">Terapi / Tindakan Sementara yang Diberikan:</p>
-                      <p className="pl-4">{therapy}</p>
+                    <div className="flex items-start gap-2">
+                      <p className="font-semibold underline shrink-0">Terapi / Tindakan Sementara yang Diberikan:</p>
+                      <p className="line-clamp-1">{therapy}</p>
                     </div>
                   )}
+                  <div className="flex items-end gap-2">
+                    <p className="font-semibold underline shrink-0">Tindakan Non-Obat:</p>
+                    <p className="flex-1 border-b border-black h-4"></p>
+                  </div>
                 </div>
 
                 <p className="mt-8 text-[12pt] leading-relaxed">
