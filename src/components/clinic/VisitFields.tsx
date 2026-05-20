@@ -196,7 +196,7 @@ export function VisitFields({
     { id: "manajemen_nyeri_nf_2", label: "Manajemen Nyeri NF (Alat)", subOptions: ["TENS", "CRYO", "AKP"] },
     { id: "manajemen_nyeri_f", label: "Manajemen Nyeri F (Analgesik)", placeholder: "Nama analgesik..." },
     { id: "posisi", label: "Membantu dan memposisi pasien dengan nyaman", placeholder: "Posisi..." },
-    { id: "alat", label: "Memberikan Edukasi penggunaan alat bantu (Kruck, Walker, Cane, Kursi Roda dll)", placeholder: "Isi manual..." },
+    { id: "alat", label: "Memberikan Edukasi penggunaan alat bantu", subOptions: ["Kruck", "Walker", "Cane", "Kursi Roda"] },
     { id: "obat", label: "Kolaborasi pemberian terapi obat" },
     { id: "bandage", label: "Pemasangan Bandage", placeholder: "Lokasi..." },
     { id: "cast_splint_pasang", label: "Pemasangan Cast / Splint", placeholder: "Lokasi dan Bentuk Cast/Splint" },
