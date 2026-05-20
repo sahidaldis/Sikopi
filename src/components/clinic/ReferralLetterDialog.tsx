@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,13 +66,15 @@ export function ReferralLetterDialog({
   const [physicalExam, setPhysicalExam] = useState(latestPhysicalExam);
 
   // Sync state when dialog opens and receives new props
-  useState(() => {
-    setDiagnosis(latestDiagnosis);
-    setAnamnesis(latestAnamnesis);
-    setTherapy(latestMedication);
-    setPhysicalExam(latestPhysicalExam);
-    setMedicalDiagnosis(latestMedicalDiagnosis);
-  });
+  useEffect(() => {
+    if (open) {
+      setDiagnosis(latestDiagnosis);
+      setAnamnesis(latestAnamnesis);
+      setTherapy(latestMedication);
+      setPhysicalExam(latestPhysicalExam);
+      setMedicalDiagnosis(latestMedicalDiagnosis);
+    }
+  }, [open, latestDiagnosis, latestAnamnesis, latestMedication, latestPhysicalExam, latestMedicalDiagnosis]);
 
   const doctorName = "Paryanto, S.Kep., Ns. MM";
   const sipNumber = "500.16.7.2/361/2024";
