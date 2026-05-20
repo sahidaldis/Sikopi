@@ -37,25 +37,32 @@ const FREQ_OPTIONS = [
   "1 x 2", "2 x 2", "3 x 2", "4 x 1", "Jika perlu (k/p)", "Lainnya",
 ];
 
-// ── Storage format: "DrugName || freq | DrugName2 || freq2" ──────────────────
-const SEP = " ‖ "; // entry separator
-const KV = " :: "; // name::freq separator
+const TIMING_OPTIONS = [
+  "Sesudah Makan", "Sebelum Makan", "Saat Makan"
+];
 
-type MedEntry = { name: string; freq: string; customFreq?: string };
+// ── Storage format: "DrugName || freq || timing" ──────────────────
+const SEP = " ‖ "; // entry separator
+const KV = " :: "; // separator
+
+type MedEntry = { name: string; freq: string; customFreq?: string; timing?: string };
 
 function parse(raw: string): MedEntry[] {
   if (!raw.trim()) return [];
   return raw.split(SEP).map((part) => {
-    const [name, freqRaw = ""] = part.split(KV);
+    const [name, freqRaw = "", timing = ""] = part.split(KV);
     const freq = FREQ_OPTIONS.includes(freqRaw) ? freqRaw : freqRaw ? "Lainnya" : "1 x 1";
     const customFreq = !FREQ_OPTIONS.includes(freqRaw) && freqRaw ? freqRaw : undefined;
-    return { name: name.trim(), freq, customFreq };
+    return { name: name.trim(), freq, customFreq, timing };
   }).filter(e => e.name);
 }
 
 function serialize(entries: MedEntry[]): string {
   return entries
-    .map((e) => `${e.name}${KV}${e.freq === "Lainnya" ? (e.customFreq || "Lainnya") : e.freq}`)
+    .map((e) => {
+      const f = e.freq === "Lainnya" ? (e.customFreq || "Lainnya") : e.freq;
+      return `${e.name}${KV}${f}${e.timing ? KV + e.timing : ""}`;
+    })
     .join(SEP);
 }
 
@@ -91,7 +98,7 @@ export function MedicationPicker({ value, onChange }: Props) {
 
   const toggle = (name: string, checked: boolean) => {
     if (checked) {
-      setEntries((prev) => [...prev, { name, freq: "1 x 1" }]);
+      setEntries((prev) => [...prev, { name, freq: "1 x 1", timing: "Sesudah Makan" }]);
     } else {
       setEntries((prev) => prev.filter((e) => e.name !== name));
     }
@@ -106,6 +113,12 @@ export function MedicationPicker({ value, onChange }: Props) {
   const updateCustomFreq = (name: string, customFreq: string) => {
     setEntries((prev) =>
       prev.map((e) => e.name === name ? { ...e, customFreq } : e)
+    );
+  };
+
+  const updateTiming = (name: string, timing: string) => {
+    setEntries((prev) =>
+      prev.map((e) => e.name === name ? { ...e, timing } : e)
     );
   };
 
@@ -152,7 +165,7 @@ export function MedicationPicker({ value, onChange }: Props) {
                 className="flex items-center gap-1 pr-1 text-xs font-normal"
               >
                 <span className="font-medium">{e.name}</span>
-                <span className="opacity-70">{freqLabel}</span>
+                <span className="opacity-70">{freqLabel}{e.timing ? ` (${e.timing})` : ""}</span>
                 <button
                   type="button"
                   onClick={() => removePill(e.name)}
@@ -168,7 +181,7 @@ export function MedicationPicker({ value, onChange }: Props) {
 
       {/* Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg max-h-[80vh] flex flex-col p-0 gap-0">
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col p-0 gap-0">
           <DialogHeader className="px-5 pt-5 pb-3 border-b shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <Pill className="size-5 text-primary" />
@@ -203,20 +216,22 @@ export function MedicationPicker({ value, onChange }: Props) {
                   key={drug}
                   className={`rounded-lg px-3 py-2 transition-colors ${checked ? "bg-primary/8 border border-primary/20" : "hover:bg-muted/50"}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={(v) => toggle(drug, !!v)}
-                      id={`drug-${drug}`}
-                    />
-                    <label
-                      htmlFor={`drug-${drug}`}
-                      className="flex-1 text-sm cursor-pointer select-none font-medium"
-                    >
-                      {drug}
-                    </label>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={(v) => toggle(drug, !!v)}
+                        id={`drug-${drug}`}
+                      />
+                      <label
+                        htmlFor={`drug-${drug}`}
+                        className="text-sm cursor-pointer select-none font-medium flex-1 truncate"
+                      >
+                        {drug}
+                      </label>
+                    </div>
                     {checked && (
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0 flex-wrap">
                         <Select value={entry?.freq || "1 x 1"} onValueChange={(v) => updateFreq(drug, v)}>
                           <SelectTrigger className="h-7 text-xs w-[110px]">
                             <SelectValue />
@@ -235,6 +250,16 @@ export function MedicationPicker({ value, onChange }: Props) {
                             onChange={(e) => updateCustomFreq(drug, e.target.value)}
                           />
                         )}
+                        <Select value={entry?.timing || "Sesudah Makan"} onValueChange={(v) => updateTiming(drug, v)}>
+                          <SelectTrigger className="h-7 text-xs w-[130px]">
+                            <SelectValue placeholder="Waktu minum" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {TIMING_OPTIONS.map((t) => (
+                              <SelectItem key={t} value={t} className="text-xs">{t}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     )}
                   </div>

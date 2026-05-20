@@ -134,6 +134,7 @@ export function VisitFields({
   const standardInterventions = [
     "Monitor tanda vital",
     "Kaji skala nyeri",
+    "Manajemen Nyeri",
     "Edukasi mobilisasi",
     "Latihan ROM",
     "Perawatan luka",
@@ -185,20 +186,22 @@ export function VisitFields({
 
   type ImplOption = { id: string; label: string; placeholder?: string };
   const implOptions: ImplOption[] = [
-    { id: "vital", label: "Monitoring tanda vital" },
-    { id: "nyeri", label: "Mengkaji skala nyeri" },
+    { id: "vital", label: "Monitoring tanda vital", placeholder: "T: ...mmHg N:...x/Menit R:...x/Menit S:...oC" },
+    { id: "nyeri", label: "Mengkaji skala nyeri", placeholder: "Isi angka manual" },
     { id: "mobilisasi", label: "Melakukan Edukasi mobilisasi", placeholder: "Contoh: Ankle Pump, Full Up setiap hari sekali" },
-    { id: "rom", label: "Mengajarkan Latihan ROM", placeholder: "Area yang dilatih..." },
-    { id: "luka", label: "Melakukan Perawatan luka", placeholder: "Detail perawatan..." },
-    { id: "cast_splint_rawat", label: "Melakukan Perawatan Cast / Splint", placeholder: "Detail perawatan..." },
-    { id: "kompres", label: "Melakukan Kompres dingin/hangat", placeholder: "Area kompres..." },
+    { id: "rom", label: "Mengajarkan Latihan ROM", placeholder: "Isi manual..." },
+    { id: "luka", label: "Melakukan Perawatan luka", placeholder: "Isi manual..." },
+    { id: "cast_splint_rawat", label: "Melakukan Perawatan Cast / Splint", placeholder: "Isi manual..." },
+    { id: "manajemen_nyeri_nf_1", label: "Manajemen Nyeri NF (Kompres dingin/hangat, Distraksi, Nafas dalam)", placeholder: "Isi manual..." },
+    { id: "manajemen_nyeri_nf_2", label: "Manajemen Nyeri NF (TENS, CRYO, AKP)", placeholder: "Isi manual..." },
+    { id: "manajemen_nyeri_f", label: "Manajemen Nyeri F (Analgesik)", placeholder: "Nama analgesik..." },
     { id: "posisi", label: "Membantu dan memposisi pasien dengan nyaman", placeholder: "Posisi..." },
-    { id: "alat", label: "Memberikan Edukasi penggunaan alat bantu" },
-    { id: "obat", label: "Kolaborasi pembarian terapi obat" },
-    { id: "bandage", label: "Pemasangan Bandage" },
-    { id: "cast_splint_pasang", label: "Pemasangan Cast / Splint" },
+    { id: "alat", label: "Memberikan Edukasi penggunaan alat bantu (Kruck, Walker, Cane, Kursi Roda dll)", placeholder: "Isi manual..." },
+    { id: "obat", label: "Kolaborasi pemberian terapi obat" },
+    { id: "bandage", label: "Pemasangan Bandage", placeholder: "Lokasi..." },
+    { id: "cast_splint_pasang", label: "Pemasangan Cast / Splint", placeholder: "Lokasi dan Bentuk Cast/Splint" },
     { id: "jatuh", label: "Edukasi Pencegahan jatuh" },
-    { id: "keluarga", label: "Edukasi keluarga tentang", placeholder: "Topik edukasi..." },
+    { id: "keluarga", label: "Edukasi keluarga tentang", placeholder: "Isi manual..." },
     { id: "lainnya", label: "Intervensi lainnya", placeholder: "Isi manual..." },
   ];
 
@@ -244,41 +247,58 @@ export function VisitFields({
 
   // Parsing state.evaluation
   const rawEvaluation = state.evaluation || "";
-  const evalOptions = [
-    "Nyeri menurun",
-    "Mobilitas membaik",
-    "Luka membaik",
-    "Tidak ada tanda infeksi",
-    "Pasien memahami edukasi",
-    "Kondisi stabil",
-    "Keluhan masih ada"
+  type EvalOption = { id: string; label: string; placeholder?: string };
+  const evalOptions: EvalOption[] = [
+    { id: "nyeri", label: "Nyeri menurun", placeholder: "Skala Nyeri..." },
+    { id: "mobilitas", label: "Mobilitas membaik" },
+    { id: "luka", label: "Luka membaik" },
+    { id: "infeksi", label: "Tidak ada tanda infeksi" },
+    { id: "edukasi", label: "Pasien memahami edukasi" },
+    { id: "stabil", label: "Kondisi stabil" },
+    { id: "keluhan", label: "Keluhan masih ada" }
   ];
   
   const parsedEvaluation = (() => {
-    const res: Record<string, boolean> = {};
-    evalOptions.forEach(opt => res[opt] = false);
+    const res: Record<string, { checked: boolean; text: string }> = {};
+    evalOptions.forEach(opt => res[opt.id] = { checked: false, text: "" });
     let note = "";
     
-    if (!rawEvaluation) return { checked: res, note };
+    if (!rawEvaluation) return { items: res, note };
     
     const parts = rawEvaluation.split(" | ");
     parts.forEach(part => {
       if (part.startsWith("Catatan tambahan:")) {
         note = part.substring("Catatan tambahan:".length).trim();
-      } else if (evalOptions.includes(part)) {
-        res[part] = true;
+      } else {
+        for (const opt of evalOptions) {
+          if (part.startsWith(opt.label)) {
+            res[opt.id].checked = true;
+            if (opt.placeholder !== undefined) {
+              let text = part.substring(opt.label.length).trim();
+              if (text.startsWith(":")) text = text.substring(1).trim();
+              res[opt.id].text = text;
+            }
+            break;
+          }
+        }
       }
     });
-    return { checked: res, note };
+    return { items: res, note };
   })();
 
-  const updateEvaluation = (opt: string, checked: boolean) => {
-    const current = { ...parsedEvaluation.checked };
-    current[opt] = checked;
+  const updateEvaluation = (id: string, checked: boolean, text: string) => {
+    const currentItems = { ...parsedEvaluation.items };
+    currentItems[id] = { checked, text };
     
     const parts: string[] = [];
     evalOptions.forEach(o => {
-      if (current[o]) parts.push(o);
+      if (currentItems[o.id].checked) {
+        if (o.placeholder !== undefined) {
+          parts.push(`${o.label} : ${currentItems[o.id].text}`);
+        } else {
+          parts.push(o.label);
+        }
+      }
     });
     if (parsedEvaluation.note) {
       parts.push(`Catatan tambahan: ${parsedEvaluation.note}`);
@@ -289,7 +309,13 @@ export function VisitFields({
   const updateEvaluationNote = (val: string) => {
     const parts: string[] = [];
     evalOptions.forEach(o => {
-      if (parsedEvaluation.checked[o]) parts.push(o);
+      if (parsedEvaluation.items[o.id].checked) {
+        if (o.placeholder !== undefined) {
+          parts.push(`${o.label} : ${parsedEvaluation.items[o.id].text}`);
+        } else {
+          parts.push(o.label);
+        }
+      }
     });
     if (val.trim()) {
       parts.push(`Catatan tambahan: ${val.trim()}`);
@@ -677,22 +703,36 @@ export function VisitFields({
             
             <div>
               <Label className="text-sm font-semibold mb-2 block">Kriteria Evaluasi</Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border bg-muted/20">
-                {evalOptions.map((opt) => (
-                  <label
-                    key={opt}
-                    className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors text-sm"
-                  >
-                    <Checkbox
-                      checked={parsedEvaluation.checked[opt]}
-                      onCheckedChange={(checked) => updateEvaluation(opt, !!checked)}
-                      className="mt-0.5"
-                    />
-                    <span>{opt}</span>
-                  </label>
-                ))}
+              <div className="grid grid-cols-1 gap-3 p-4 rounded-xl border bg-muted/20">
+                {evalOptions.map((opt) => {
+                  const isChecked = parsedEvaluation.items[opt.id].checked;
+                  const textVal = parsedEvaluation.items[opt.id].text;
+                  return (
+                    <div key={opt.id} className="flex flex-col sm:flex-row sm:items-center gap-2">
+                      <label className="flex items-center gap-2.5 cursor-pointer text-sm sm:min-w-[200px]">
+                        <Checkbox
+                          checked={isChecked}
+                          onCheckedChange={(checked) => updateEvaluation(opt.id, !!checked, textVal)}
+                        />
+                        <span className={opt.placeholder !== undefined ? "font-medium" : ""}>
+                          {opt.label} {opt.placeholder !== undefined ? ":" : ""}
+                        </span>
+                      </label>
+                      {opt.placeholder !== undefined && (
+                        <Input
+                          type="text"
+                          placeholder={opt.placeholder}
+                          value={textVal}
+                          onChange={(e) => updateEvaluation(opt.id, isChecked, e.target.value)}
+                          disabled={!isChecked}
+                          className="flex-1"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
                 
-                <div className="sm:col-span-2 border-t pt-3 mt-1 flex flex-col gap-2">
+                <div className="border-t pt-3 mt-1 flex flex-col gap-2">
                   <Label>Catatan tambahan : (Isi manual)</Label>
                   <Textarea
                     rows={2}
