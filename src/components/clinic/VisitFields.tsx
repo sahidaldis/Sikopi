@@ -184,7 +184,7 @@ export function VisitFields({
   // Parsing state.nursing_implementation for Nursing Implementation
   const rawImplementation = state.nursing_implementation || "";
 
-  type ImplOption = { id: string; label: string; placeholder?: string };
+  type ImplOption = { id: string; label: string; placeholder?: string; subOptions?: string[] };
   const implOptions: ImplOption[] = [
     { id: "vital", label: "Monitoring tanda vital", placeholder: "..." },
     { id: "nyeri", label: "Mengkaji skala nyeri", placeholder: "Isi angka manual" },
@@ -192,8 +192,8 @@ export function VisitFields({
     { id: "rom", label: "Mengajarkan Latihan ROM", placeholder: "Isi manual..." },
     { id: "luka", label: "Melakukan Perawatan luka", placeholder: "Isi manual..." },
     { id: "cast_splint_rawat", label: "Melakukan Perawatan Cast / Splint", placeholder: "Isi manual..." },
-    { id: "manajemen_nyeri_nf_1", label: "Manajemen Nyeri NF (Kompres dingin/hangat, Distraksi, Nafas dalam)", placeholder: "Isi manual..." },
-    { id: "manajemen_nyeri_nf_2", label: "Manajemen Nyeri NF (TENS, CRYO, AKP)", placeholder: "Isi manual..." },
+    { id: "manajemen_nyeri_nf_1", label: "Manajemen Nyeri NF (Manual)", subOptions: ["Kompres dingin/hangat", "Distraksi", "Nafas dalam"] },
+    { id: "manajemen_nyeri_nf_2", label: "Manajemen Nyeri NF (Alat)", subOptions: ["TENS", "CRYO", "AKP"] },
     { id: "manajemen_nyeri_f", label: "Manajemen Nyeri F (Analgesik)", placeholder: "Nama analgesik..." },
     { id: "posisi", label: "Membantu dan memposisi pasien dengan nyaman", placeholder: "Posisi..." },
     { id: "alat", label: "Memberikan Edukasi penggunaan alat bantu (Kruck, Walker, Cane, Kursi Roda dll)", placeholder: "Isi manual..." },
@@ -206,9 +206,9 @@ export function VisitFields({
   ];
 
   const parsedImplementation = (() => {
-    const res: Record<string, { checked: boolean; text: string; vitals?: {t: string, n: string, r: string, s: string} }> = {};
+    const res: Record<string, { checked: boolean; text: string; vitals?: {t: string, n: string, r: string, s: string}; subSelections?: string[] }> = {};
     implOptions.forEach((opt) => {
-      res[opt.id] = { checked: false, text: "", vitals: opt.id === "vital" ? {t: "", n: "", r: "", s: ""} : undefined };
+      res[opt.id] = { checked: false, text: "", vitals: opt.id === "vital" ? {t: "", n: "", r: "", s: ""} : undefined, subSelections: opt.subOptions ? [] : undefined };
     });
     
     if (!rawImplementation) return res;
@@ -218,10 +218,14 @@ export function VisitFields({
       for (const opt of implOptions) {
         if (part.startsWith(opt.label)) {
           res[opt.id].checked = true;
-          if (opt.placeholder !== undefined) {
+          if (opt.placeholder !== undefined || opt.subOptions !== undefined) {
             let text = part.substring(opt.label.length).trim();
             if (text.startsWith(":")) text = text.substring(1).trim();
             res[opt.id].text = text;
+            
+            if (opt.subOptions) {
+              res[opt.id].subSelections = text.split(",").map(s => s.trim()).filter(Boolean);
+            }
             
             if (opt.id === "vital") {
               const tMatch = text.match(/T:\s*(.*?)(?=\s*mmHg)/);
@@ -245,14 +249,12 @@ export function VisitFields({
 
   const updateImplementation = (id: string, checked: boolean, text: string, currentItemsObj?: any) => {
     const current = currentItemsObj || { ...parsedImplementation };
-    if (!currentItemsObj) {
-      current[id] = { ...current[id], checked, text };
-    }
+    current[id] = { ...current[id], checked, text };
     
     const parts: string[] = [];
     implOptions.forEach((opt) => {
       if (current[opt.id].checked) {
-        if (opt.placeholder !== undefined) {
+        if (opt.placeholder !== undefined || opt.subOptions !== undefined) {
           parts.push(`${opt.label} : ${current[opt.id].text}`);
         } else {
           parts.push(opt.label);
@@ -260,6 +262,25 @@ export function VisitFields({
       }
     });
     set({ nursing_implementation: parts.join(" | ") });
+  };
+
+  const toggleSubOption = (id: string, subOpt: string, isChecked: boolean, parentChecked: boolean) => {
+    const currentObj = { ...parsedImplementation };
+    let currentSubs = [...(currentObj[id].subSelections || [])];
+    if (isChecked) {
+      if (!currentSubs.includes(subOpt)) currentSubs.push(subOpt);
+    } else {
+      currentSubs = currentSubs.filter(s => s !== subOpt);
+    }
+    const newText = currentSubs.join(", ");
+    currentObj[id].subSelections = currentSubs;
+    
+    let newParentChecked = parentChecked;
+    if (isChecked && !parentChecked) {
+      newParentChecked = true;
+    }
+    
+    updateImplementation(id, newParentChecked, newText, currentObj);
   };
 
   const updateVital = (field: 't'|'n'|'r'|'s', val: string, isChecked: boolean) => {
@@ -657,13 +678,13 @@ export function VisitFields({
                 const textVal = parsedImplementation[opt.id].text;
                 return (
                   <div key={opt.id} className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <label className="flex items-center gap-2.5 cursor-pointer text-sm sm:min-w-[350px]">
+                    <label className="flex items-center gap-2.5 cursor-pointer text-sm sm:min-w-[200px]">
                       <Checkbox
                         checked={isChecked}
                         onCheckedChange={(checked) => updateImplementation(opt.id, !!checked, textVal)}
                       />
-                      <span className={opt.placeholder !== undefined ? "font-medium" : ""}>
-                        {opt.label} {opt.placeholder !== undefined ? ":" : ""}
+                      <span className={(opt.placeholder !== undefined || opt.subOptions !== undefined) ? "font-medium" : ""}>
+                        {opt.label} {opt.placeholder !== undefined || opt.subOptions !== undefined ? ":" : ""}
                       </span>
                     </label>
                     {opt.placeholder !== undefined && opt.id !== "vital" && (
@@ -675,6 +696,20 @@ export function VisitFields({
                         disabled={!isChecked}
                         className="flex-1"
                       />
+                    )}
+                    {opt.subOptions && opt.id !== "vital" && (
+                      <div className="flex-1 flex flex-wrap gap-3 mt-2 sm:mt-0">
+                        {opt.subOptions.map(sub => (
+                          <label key={sub} className="flex items-center gap-1.5 cursor-pointer text-sm">
+                            <Checkbox
+                              checked={parsedImplementation[opt.id].subSelections?.includes(sub)}
+                              onCheckedChange={(c) => toggleSubOption(opt.id, sub, !!c, isChecked)}
+                              disabled={!isChecked}
+                            />
+                            <span className="text-muted-foreground">{sub}</span>
+                          </label>
+                        ))}
+                      </div>
                     )}
                     {opt.id === "vital" && (
                       <div className="flex-1 flex flex-wrap gap-3">
