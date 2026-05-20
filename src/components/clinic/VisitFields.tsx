@@ -186,7 +186,7 @@ export function VisitFields({
 
   type ImplOption = { id: string; label: string; placeholder?: string };
   const implOptions: ImplOption[] = [
-    { id: "vital", label: "Monitoring tanda vital", placeholder: "T: ...mmHg N:...x/Menit R:...x/Menit S:...oC" },
+    { id: "vital", label: "Monitoring tanda vital", placeholder: "..." },
     { id: "nyeri", label: "Mengkaji skala nyeri", placeholder: "Isi angka manual" },
     { id: "mobilisasi", label: "Melakukan Edukasi mobilisasi", placeholder: "Contoh: Ankle Pump, Full Up setiap hari sekali" },
     { id: "rom", label: "Mengajarkan Latihan ROM", placeholder: "Isi manual..." },
@@ -206,8 +206,10 @@ export function VisitFields({
   ];
 
   const parsedImplementation = (() => {
-    const res: Record<string, { checked: boolean; text: string }> = {};
-    implOptions.forEach((opt) => (res[opt.id] = { checked: false, text: "" }));
+    const res: Record<string, { checked: boolean; text: string; vitals?: {t: string, n: string, r: string, s: string} }> = {};
+    implOptions.forEach((opt) => {
+      res[opt.id] = { checked: false, text: "", vitals: opt.id === "vital" ? {t: "", n: "", r: "", s: ""} : undefined };
+    });
     
     if (!rawImplementation) return res;
     
@@ -220,6 +222,19 @@ export function VisitFields({
             let text = part.substring(opt.label.length).trim();
             if (text.startsWith(":")) text = text.substring(1).trim();
             res[opt.id].text = text;
+            
+            if (opt.id === "vital") {
+              const tMatch = text.match(/T:\s*(.*?)(?=\s*mmHg)/);
+              const nMatch = text.match(/N:\s*(.*?)(?=\s*x\/Menit)/);
+              const rMatch = text.match(/R:\s*(.*?)(?=\s*x\/Menit)/);
+              const sMatch = text.match(/S:\s*(.*?)(?=\s*oC)/);
+              res[opt.id].vitals = {
+                t: tMatch ? tMatch[1].trim() : "",
+                n: nMatch ? nMatch[1].trim() : "",
+                r: rMatch ? rMatch[1].trim() : "",
+                s: sMatch ? sMatch[1].trim() : "",
+              };
+            }
           }
           break;
         }
@@ -228,9 +243,11 @@ export function VisitFields({
     return res;
   })();
 
-  const updateImplementation = (id: string, checked: boolean, text: string) => {
-    const current = { ...parsedImplementation };
-    current[id] = { checked, text };
+  const updateImplementation = (id: string, checked: boolean, text: string, currentItemsObj?: any) => {
+    const current = currentItemsObj || { ...parsedImplementation };
+    if (!currentItemsObj) {
+      current[id] = { ...current[id], checked, text };
+    }
     
     const parts: string[] = [];
     implOptions.forEach((opt) => {
@@ -243,6 +260,23 @@ export function VisitFields({
       }
     });
     set({ nursing_implementation: parts.join(" | ") });
+  };
+
+  const updateVital = (field: 't'|'n'|'r'|'s', val: string, isChecked: boolean) => {
+    const v = { ...(parsedImplementation["vital"].vitals || {t: "", n: "", r: "", s: ""}) };
+    v[field] = val;
+    
+    let textParts = [];
+    if (v.t) textParts.push(`T: ${v.t} mmHg`);
+    if (v.n) textParts.push(`N: ${v.n} x/Menit`);
+    if (v.r) textParts.push(`R: ${v.r} x/Menit`);
+    if (v.s) textParts.push(`S: ${v.s} oC`);
+    
+    const text = textParts.join("  ");
+    
+    const current = { ...parsedImplementation };
+    current["vital"] = { checked: isChecked, text, vitals: v };
+    updateImplementation("vital", isChecked, text, current);
   };
 
   // Parsing state.evaluation
@@ -632,7 +666,7 @@ export function VisitFields({
                         {opt.label} {opt.placeholder !== undefined ? ":" : ""}
                       </span>
                     </label>
-                    {opt.placeholder !== undefined && (
+                    {opt.placeholder !== undefined && opt.id !== "vital" && (
                       <Input
                         type="text"
                         placeholder={opt.placeholder}
@@ -641,6 +675,54 @@ export function VisitFields({
                         disabled={!isChecked}
                         className="flex-1"
                       />
+                    )}
+                    {opt.id === "vital" && (
+                      <div className="flex-1 flex flex-wrap gap-3">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-medium">T:</span>
+                          <Input
+                            className="w-16 h-8 text-xs px-2"
+                            placeholder="..."
+                            value={parsedImplementation["vital"].vitals?.t || ""}
+                            onChange={(e) => updateVital("t", e.target.value, isChecked)}
+                            disabled={!isChecked}
+                          />
+                          <span className="text-xs text-muted-foreground">mmHg</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-medium">N:</span>
+                          <Input
+                            className="w-14 h-8 text-xs px-2"
+                            placeholder="..."
+                            value={parsedImplementation["vital"].vitals?.n || ""}
+                            onChange={(e) => updateVital("n", e.target.value, isChecked)}
+                            disabled={!isChecked}
+                          />
+                          <span className="text-xs text-muted-foreground">x/Menit</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-medium">R:</span>
+                          <Input
+                            className="w-14 h-8 text-xs px-2"
+                            placeholder="..."
+                            value={parsedImplementation["vital"].vitals?.r || ""}
+                            onChange={(e) => updateVital("r", e.target.value, isChecked)}
+                            disabled={!isChecked}
+                          />
+                          <span className="text-xs text-muted-foreground">x/Menit</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-medium">S:</span>
+                          <Input
+                            className="w-14 h-8 text-xs px-2"
+                            placeholder="..."
+                            value={parsedImplementation["vital"].vitals?.s || ""}
+                            onChange={(e) => updateVital("s", e.target.value, isChecked)}
+                            disabled={!isChecked}
+                          />
+                          <span className="text-xs text-muted-foreground">oC</span>
+                        </div>
+                      </div>
                     )}
                   </div>
                 );
