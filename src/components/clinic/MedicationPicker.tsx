@@ -41,19 +41,35 @@ const TIMING_OPTIONS = [
   "Sesudah Makan", "Sebelum Makan"
 ];
 
+const QTY_OPTIONS = ["5", "10", "15", "20", "30", "Lainnya"];
+const UNIT_OPTIONS = ["Tab", "Caps", "ml", "kaplet"];
+
 // ── Storage format: "DrugName || freq || timing" ──────────────────
 const SEP = " ‖ "; // entry separator
 const KV = " :: "; // separator
 
-type MedEntry = { name: string; freq: string; customFreq?: string; timing?: string };
+type MedEntry = { name: string; qty: string; customQty?: string; unit: string; freq: string; customFreq?: string; timing?: string };
 
 function parse(raw: string): MedEntry[] {
   if (!raw.trim()) return [];
   return raw.split(SEP).map((part) => {
-    const [name, freqRaw = "", timing = ""] = part.split(KV);
+    const p = part.split(KV);
+    let name = "", qtyRaw = "10", unit = "Tab", freqRaw = "", timing = "";
+    
+    if (p.length === 5) {
+      name = p[0] || ""; qtyRaw = p[1] || ""; unit = p[2] || "Tab"; freqRaw = p[3] || ""; timing = p[4] || "";
+    } else {
+      // Backward compat
+      name = p[0] || ""; freqRaw = p[1] || ""; timing = p[2] || "";
+    }
+
     const freq = FREQ_OPTIONS.includes(freqRaw) ? freqRaw : freqRaw ? "Lainnya" : "1 x 1";
     const customFreq = !FREQ_OPTIONS.includes(freqRaw) && freqRaw ? freqRaw : undefined;
-    return { name: name.trim(), freq, customFreq, timing };
+    
+    const qty = QTY_OPTIONS.includes(qtyRaw) ? qtyRaw : qtyRaw ? "Lainnya" : "10";
+    const customQty = !QTY_OPTIONS.includes(qtyRaw) && qtyRaw ? qtyRaw : undefined;
+
+    return { name: name.trim(), qty, customQty, unit, freq, customFreq, timing };
   }).filter(e => e.name);
 }
 
@@ -61,7 +77,8 @@ function serialize(entries: MedEntry[]): string {
   return entries
     .map((e) => {
       const f = e.freq === "Lainnya" ? (e.customFreq || "Lainnya") : e.freq;
-      return `${e.name}${KV}${f}${e.timing ? KV + e.timing : ""}`;
+      const q = e.qty === "Lainnya" ? (e.customQty || "Lainnya") : e.qty;
+      return `${e.name}${KV}${q}${KV}${e.unit}${KV}${f}${KV}${e.timing || ""}`;
     })
     .join(SEP);
 }
@@ -98,10 +115,20 @@ export function MedicationPicker({ value, onChange }: Props) {
 
   const toggle = (name: string, checked: boolean) => {
     if (checked) {
-      setEntries((prev) => [...prev, { name, freq: "1 x 1", timing: "Sesudah Makan" }]);
+      setEntries((prev) => [...prev, { name, qty: "10", unit: "Tab", freq: "1 x 1", timing: "Sesudah Makan" }]);
     } else {
       setEntries((prev) => prev.filter((e) => e.name !== name));
     }
+  };
+
+  const updateQty = (name: string, qty: string) => {
+    setEntries((prev) => prev.map((e) => e.name === name ? { ...e, qty, customQty: qty !== "Lainnya" ? undefined : e.customQty } : e));
+  };
+  const updateCustomQty = (name: string, customQty: string) => {
+    setEntries((prev) => prev.map((e) => e.name === name ? { ...e, customQty } : e));
+  };
+  const updateUnit = (name: string, unit: string) => {
+    setEntries((prev) => prev.map((e) => e.name === name ? { ...e, unit } : e));
   };
 
   const updateFreq = (name: string, freq: string) => {
@@ -158,6 +185,7 @@ export function MedicationPicker({ value, onChange }: Props) {
         <div className="flex flex-wrap gap-1.5 pt-1">
           {displayPills.map((e) => {
             const freqLabel = e.freq === "Lainnya" ? (e.customFreq || "Lainnya") : e.freq;
+            const qtyLabel = e.qty === "Lainnya" ? (e.customQty || "Lainnya") : e.qty;
             return (
               <Badge
                 key={e.name}
@@ -165,7 +193,7 @@ export function MedicationPicker({ value, onChange }: Props) {
                 className="flex items-center gap-1 pr-1 text-xs font-normal"
               >
                 <span className="font-medium">{e.name}</span>
-                <span className="opacity-70">{freqLabel}{e.timing ? ` (${e.timing})` : ""}</span>
+                <span className="opacity-70">{qtyLabel} {e.unit}, {freqLabel}{e.timing ? ` (${e.timing})` : ""}</span>
                 <button
                   type="button"
                   onClick={() => removePill(e.name)}
@@ -232,6 +260,35 @@ export function MedicationPicker({ value, onChange }: Props) {
                     </div>
                     {checked && (
                       <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                        <Select value={entry?.qty || "10"} onValueChange={(v) => updateQty(drug, v)}>
+                          <SelectTrigger className="h-7 text-xs w-[70px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {QTY_OPTIONS.map((q) => (
+                              <SelectItem key={q} value={q} className="text-xs">{q}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {entry?.qty === "Lainnya" && (
+                          <Input
+                            className="h-7 text-xs w-[60px]"
+                            placeholder="Jml"
+                            value={entry?.customQty || ""}
+                            onChange={(e) => updateCustomQty(drug, e.target.value)}
+                          />
+                        )}
+                        <Select value={entry?.unit || "Tab"} onValueChange={(v) => updateUnit(drug, v)}>
+                          <SelectTrigger className="h-7 text-xs w-[80px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {UNIT_OPTIONS.map((u) => (
+                              <SelectItem key={u} value={u} className="text-xs">{u}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
                         <Select value={entry?.freq || "1 x 1"} onValueChange={(v) => updateFreq(drug, v)}>
                           <SelectTrigger className="h-7 text-xs w-[110px]">
                             <SelectValue />
