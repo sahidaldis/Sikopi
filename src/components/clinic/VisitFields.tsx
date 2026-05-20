@@ -678,7 +678,7 @@ export function VisitFields({
                 const textVal = parsedImplementation[opt.id].text;
                 return (
                   <div key={opt.id} className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <label className="flex items-center gap-2.5 cursor-pointer text-sm sm:min-w-[200px]">
+                    <label className="flex items-center gap-2.5 cursor-pointer text-sm sm:w-[350px] shrink-0">
                       <Checkbox
                         checked={isChecked}
                         onCheckedChange={(checked) => updateImplementation(opt.id, !!checked, textVal)}
@@ -826,7 +826,7 @@ export function VisitFields({
                   const textVal = parsedEvaluation.items[opt.id].text;
                   return (
                     <div key={opt.id} className="flex flex-col sm:flex-row sm:items-center gap-2">
-                      <label className="flex items-center gap-2.5 cursor-pointer text-sm sm:min-w-[200px]">
+                      <label className="flex items-center gap-2.5 cursor-pointer text-sm sm:w-[350px] shrink-0">
                         <Checkbox
                           checked={isChecked}
                           onCheckedChange={(checked) => updateEvaluation(opt.id, !!checked, textVal)}
