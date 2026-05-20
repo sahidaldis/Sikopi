@@ -585,7 +585,7 @@ export function VisitFields({
           </div>
 
           <div className="md:col-span-2 border-t pt-4 mt-2">
-            <Label className="text-sm font-semibold mb-2 block text-primary">Nursing Diagnosis</Label>
+            <Label className="text-sm font-semibold mb-2 block text-primary">DX Keperawatan</Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border bg-muted/20">
               {standardDiagnoses.map((diag) => {
                 const isChecked = parsedDiagnoses.includes(diag);
