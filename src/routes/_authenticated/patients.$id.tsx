@@ -101,8 +101,8 @@ function PatientDetailPage() {
               variant="outline"
               className="text-amber-600 border-amber-200 hover:bg-amber-50 hover:text-amber-700"
               onClick={() => {
-                setActiveDiagnosis(visits[0]?.final_diagnosis || "");
-                setActiveAnamnesis(visits[0]?.anamnesis || "");
+                setActiveDiagnosis(visits[0]?.main_nursing_diagnosis || "");
+                setActiveAnamnesis(visits[0]?.main_complaint || "");
                 setSickLeaveOpen(true);
               }}
             >
