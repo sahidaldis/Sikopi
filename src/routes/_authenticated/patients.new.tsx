@@ -39,6 +39,7 @@ function NewPatientPage() {
     address: "",
     phone: "",
     education: "",
+    occupation: "",
     allergy_flag: "no",
     allergy_details: "",
   });
@@ -59,6 +60,7 @@ function NewPatientPage() {
           address: p.address || null,
           phone: p.phone || null,
           education: p.education || null,
+          occupation: p.occupation || null,
           allergy_flag: p.allergy_flag === "yes",
           allergy_details: p.allergy_flag === "yes" ? p.allergy_details || null : null,
         })
@@ -127,6 +129,10 @@ function NewPatientPage() {
                 <SelectItem value="Lain-lain">Lain-lain</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <Label>Pekerjaan</Label>
+            <Input value={p.occupation} onChange={(e) => setP({ ...p, occupation: e.target.value })} />
           </div>
           <div>
             <Label>Phone Number</Label>

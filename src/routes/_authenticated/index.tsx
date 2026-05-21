@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { UserPlus, UserSearch, Users, Activity, X } from "lucide-react";
+import { UserPlus, UserSearch, Users, Activity, X, MonitorUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,11 +42,30 @@ function Dashboard() {
     return () => clearTimeout(t);
   }, [q, open]);
 
+  const handleSendToDesktop = () => {
+    const urlContent = `[InternetShortcut]\nURL=${window.location.origin}\nIconIndex=0\nIconFile=${window.location.origin}/favicon.ico`;
+    const blob = new Blob([urlContent], { type: "application/x-mswebsite" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "SIKOPI.url";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
-        <p className="text-muted-foreground mt-1">Choose an action to begin a patient session.</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
+          <p className="text-muted-foreground mt-1">Choose an action to begin a patient session.</p>
+        </div>
+        <Button onClick={handleSendToDesktop} variant="outline" className="gap-2">
+          <MonitorUp className="size-4" />
+          Send to Desktop
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

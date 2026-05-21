@@ -11,6 +11,7 @@ type Patient = {
   dob: string | null;
   gender: string | null;
   address: string | null;
+  occupation?: string | null;
 };
 
 type SickLeaveDialogProps = {
@@ -241,7 +242,7 @@ export function SickLeaveDialog({
                       <tr className="h-7">
                         <td className="align-top">Pekerjaan</td>
                         <td className="align-top">:</td>
-                        <td className="align-top">—</td>
+                        <td className="align-top">{patient.occupation || "—"}</td>
                       </tr>
                       <tr className="h-7">
                         <td className="align-top">Alamat</td>
@@ -270,7 +271,7 @@ export function SickLeaveDialog({
               </div>
 
               {/* Tanda Tangan */}
-              <div className="mt-10 flex justify-end text-[12pt] break-inside-avoid">
+              <div className="mt-4 flex justify-end text-[12pt] break-inside-avoid">
                 <div className="text-left w-64 space-y-16">
                   <div>
                     <p>Trucuk, {formatIndonesianDate(new Date())}</p>

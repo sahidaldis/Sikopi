@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/patients/$id")({
 type Patient = {
   id: string; mrn: string; full_name: string; national_id: string | null;
   dob: string | null; gender: string | null; address: string | null;
-  phone: string | null; education: string | null; allergy_flag: boolean; allergy_details: string | null;
+  phone: string | null; education: string | null; occupation: string | null; allergy_flag: boolean; allergy_details: string | null;
 };
 type Visit = {
   id: string; visited_at: string; main_complaint: string | null; anamnesis: string | null;
@@ -88,6 +88,7 @@ function PatientDetailPage() {
               <div>Phone: <span className="text-foreground">{patient.phone ?? "—"}</span></div>
               <div>National ID: <span className="text-foreground">{patient.national_id ?? "—"}</span></div>
               <div>Education: <span className="text-foreground">{patient.education ?? "—"}</span></div>
+              <div>Occupation: <span className="text-foreground">{patient.occupation ?? "—"}</span></div>
               <div className="sm:col-span-2">Address: <span className="text-foreground">{patient.address ?? "—"}</span></div>
               {patient.allergy_flag && (
                 <div className="sm:col-span-2 mt-2 rounded-md bg-destructive/10 text-destructive px-3 py-2 text-sm">
@@ -242,6 +243,7 @@ function EditPatientDialog({ open, onClose, patient, onSaved }: { open: boolean;
       address: form.address || null,
       phone: form.phone || null,
       education: form.education || null,
+      occupation: form.occupation || null,
       allergy_flag: form.allergy_flag,
       allergy_details: form.allergy_flag ? form.allergy_details : null,
     }).eq("id", patient.id);
@@ -283,6 +285,7 @@ function EditPatientDialog({ open, onClose, patient, onSaved }: { open: boolean;
               </SelectContent>
             </Select>
           </div>
+          <div><Label>Pekerjaan</Label><Input value={form.occupation ?? ""} onChange={(e) => setForm({ ...form, occupation: e.target.value })} /></div>
           <div><Label>Phone Number</Label><Input value={form.phone ?? ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
           <div className="md:col-span-2"><Label>Address</Label><Textarea rows={2} value={form.address ?? ""} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
           <div className="md:col-span-2 flex items-center gap-2">
