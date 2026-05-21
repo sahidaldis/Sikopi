@@ -17,6 +17,7 @@ type PatientLite = { id: string; mrn: string; full_name: string; address: string
 function Dashboard() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [showDesktopInstructions, setShowDesktopInstructions] = useState(false);
   const [q, setQ] = useState("");
   const [results, setResults] = useState<PatientLite[]>([]);
   const [stats, setStats] = useState({ patients: 0, visitsToday: 0 });
@@ -43,16 +44,7 @@ function Dashboard() {
   }, [q, open]);
 
   const handleSendToDesktop = () => {
-    const urlContent = `[InternetShortcut]\nURL=${window.location.origin}\nIconIndex=0\nIconFile=${window.location.origin}/favicon.ico`;
-    const blob = new Blob([urlContent], { type: "application/x-mswebsite" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "SIKOPI.url";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setShowDesktopInstructions(true);
   };
 
   return (
@@ -158,6 +150,46 @@ function Dashboard() {
                 ))
               )}
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDesktopInstructions} onOpenChange={setShowDesktopInstructions}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Buat Aplikasi Desktop SIKOPI</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-foreground">
+            <p>
+              Untuk keamanan, browser memblokir download file otomatis. Sebagai gantinya, Anda bisa menginstal SIKOPI langsung sebagai aplikasi desktop yang jauh lebih canggih dan resmi melalui fitur browser Anda:
+            </p>
+            <div className="bg-muted p-4 rounded-lg space-y-3">
+              <div>
+                <p className="font-semibold text-primary mb-1">Jika memakai Google Chrome:</p>
+                <ol className="list-decimal pl-4 space-y-1">
+                  <li>Klik ikon <b>Titik Tiga (⋮)</b> di pojok kanan atas browser.</li>
+                  <li>Pilih <b>Save and share</b> (Simpan dan bagikan).</li>
+                  <li>Pilih <b>Create shortcut...</b> (Buat pintasan).</li>
+                  <li>Centang <b>"Open as window"</b> (Buka sebagai jendela).</li>
+                  <li>Klik <b>Create</b>.</li>
+                </ol>
+              </div>
+              <div className="pt-2 border-t border-border">
+                <p className="font-semibold text-primary mb-1">Jika memakai Microsoft Edge:</p>
+                <ol className="list-decimal pl-4 space-y-1">
+                  <li>Klik ikon <b>Titik Tiga (⋯)</b> di pojok kanan atas browser.</li>
+                  <li>Pilih menu <b>Apps</b> (Aplikasi).</li>
+                  <li>Pilih <b>Install this site as an app</b>.</li>
+                  <li>Klik <b>Install</b>.</li>
+                </ol>
+              </div>
+            </div>
+            <p className="text-muted-foreground mt-2">
+              Selesai! SIKOPI kini akan memiliki ikon logo sendiri di Desktop Anda dan bisa dibuka seperti aplikasi biasa tanpa kolom pencarian browser.
+            </p>
+          </div>
+          <div className="flex justify-end mt-2">
+            <Button onClick={() => setShowDesktopInstructions(false)}>Mengerti</Button>
           </div>
         </DialogContent>
       </Dialog>
