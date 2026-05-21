@@ -200,7 +200,7 @@ export function SickLeaveDialog({
           <div className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold sticky top-0 bg-muted/80 backdrop-blur z-10 py-2">Live Preview Surat</div>
           
           <div className="flex justify-center origin-top" style={{ transform: 'scale(0.85)' }}>
-            <div id="printable-sick-leave" className="bg-white text-black p-10 shadow-xl border w-[210mm] min-h-[297mm] flex flex-col justify-between" style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '12pt' }}>
+            <div id="printable-sick-leave" className="bg-white text-black p-10 shadow-xl border w-[210mm] min-h-[297mm] flex flex-col" style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '12pt' }}>
               <div>
                 {/* Kop Surat (Header) */}
                 <div className="flex items-center gap-6 border-b-[3px] border-black pb-4 mb-6">
@@ -271,7 +271,7 @@ export function SickLeaveDialog({
               </div>
 
               {/* Tanda Tangan */}
-              <div className="mt-4 flex justify-end text-[12pt] break-inside-avoid">
+              <div className="mt-12 flex justify-end text-[12pt] break-inside-avoid">
                 <div className="text-left w-64 space-y-16">
                   <div>
                     <p>Trucuk, {formatIndonesianDate(new Date())}</p>
