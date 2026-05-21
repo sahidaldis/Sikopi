@@ -2,7 +2,7 @@
   "name": "SIKOPI — Sistem Informasi Keperawatan Ortopedi Praktik Independen",
   "short_name": "SIKOPI",
   "description": "Aplikasi sistem informasi keperawatan ortopedi untuk praktik mandiri.",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0ea5e9",
