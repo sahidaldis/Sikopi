@@ -80,7 +80,7 @@ export function VisitFields({
   showEvaluation?: boolean;
 }) {
   const parsedDiagnoses = state.assessment
-    ? state.assessment.split(", ").map((d) => d.trim()).filter(Boolean)
+    ? state.assessment.split(", ").map((d) => d.trimStart()).filter(Boolean)
     : [];
 
   const standardDiagnoses = [
@@ -123,14 +123,14 @@ export function VisitFields({
   const handleCustomDiagnosisChange = (val: string) => {
     let next = parsedDiagnoses.filter((d) => standardDiagnoses.includes(d));
     if (val.trim()) {
-      next.push(val.trim());
+      next.push(val);
     }
     set({ assessment: next.join(", ") });
   };
 
   // Parsing state.planning for Nursing Interventions
   const parsedInterventions = state.planning
-    ? state.planning.split(", ").map((i) => i.trim()).filter(Boolean)
+    ? state.planning.split(", ").map((i) => i.trimStart()).filter(Boolean)
     : [];
 
   const standardInterventions = [
@@ -179,7 +179,7 @@ export function VisitFields({
   const handleCustomInterventionChange = (val: string) => {
     let next = parsedInterventions.filter((i) => standardInterventions.includes(i));
     if (val.trim()) {
-      next.push(val.trim());
+      next.push(val);
     }
     set({ planning: next.join(", ") });
   };
@@ -222,8 +222,8 @@ export function VisitFields({
         if (part.startsWith(opt.label)) {
           res[opt.id].checked = true;
           if (opt.placeholder !== undefined || opt.subOptions !== undefined) {
-            let text = part.substring(opt.label.length).trim();
-            if (text.startsWith(":")) text = text.substring(1).trim();
+            let text = part.substring(opt.label.length).trimStart();
+            if (text.startsWith(":")) text = text.substring(1).trimStart();
             res[opt.id].text = text;
 
             if (opt.subOptions) {
@@ -236,10 +236,10 @@ export function VisitFields({
               const rMatch = text.match(/R:\s*(.*?)(?=\s*x\/Menit)/);
               const sMatch = text.match(/S:\s*(.*?)(?=\s*oC)/);
               res[opt.id].vitals = {
-                t: tMatch ? tMatch[1].trim() : "",
-                n: nMatch ? nMatch[1].trim() : "",
-                r: rMatch ? rMatch[1].trim() : "",
-                s: sMatch ? sMatch[1].trim() : "",
+                t: tMatch ? tMatch[1].trimStart() : "",
+                n: nMatch ? nMatch[1].trimStart() : "",
+                r: rMatch ? rMatch[1].trimStart() : "",
+                s: sMatch ? sMatch[1].trimStart() : "",
               };
             }
           }
@@ -326,14 +326,14 @@ export function VisitFields({
     const parts = rawEvaluation.split(" | ");
     parts.forEach(part => {
       if (part.startsWith("Catatan tambahan:")) {
-        note = part.substring("Catatan tambahan:".length).trim();
+        note = part.substring("Catatan tambahan:".length).trimStart();
       } else {
         for (const opt of evalOptions) {
           if (part.startsWith(opt.label)) {
             res[opt.id].checked = true;
             if (opt.placeholder !== undefined) {
-              let text = part.substring(opt.label.length).trim();
-              if (text.startsWith(":")) text = text.substring(1).trim();
+              let text = part.substring(opt.label.length).trimStart();
+              if (text.startsWith(":")) text = text.substring(1).trimStart();
               res[opt.id].text = text;
             }
             break;
@@ -376,14 +376,14 @@ export function VisitFields({
       }
     });
     if (val.trim()) {
-      parts.push(`Catatan tambahan: ${val.trim()}`);
+      parts.push(`Catatan tambahan: ${val}`);
     }
     set({ evaluation: parts.join(" | ") });
   };
 
   // Parsing state.followup for Follow-up Instructions
   const parsedFollowups = state.followup
-    ? state.followup.split(", ").map((f) => f.trim()).filter(Boolean)
+    ? state.followup.split(", ").map((f) => f.trimStart()).filter(Boolean)
     : [];
 
   const followupOptions = [
@@ -424,7 +424,7 @@ export function VisitFields({
       const idx = part.indexOf(":");
       if (idx === -1) return;
       const key = part.slice(0, idx).trim();
-      const val = part.slice(idx + 1).trim();
+      const val = part.slice(idx + 1).trimStart();
 
       const cleanVal = val === "—" ? "" : val;
 
@@ -462,10 +462,10 @@ export function VisitFields({
     }
 
     const parts: string[] = [];
-    if (current.labChecked) parts.push(`Laboratorium: ${current.lab.trim() || "—"}`);
-    if (current.paChecked) parts.push(`PA: ${current.pa.trim() || "—"}`);
-    if (current.radChecked) parts.push(`Radiologi: ${current.rad.trim() || "—"}`);
-    if (current.kulturChecked) parts.push(`Kultur: ${current.kultur.trim() || "—"}`);
+    if (current.labChecked) parts.push(`Laboratorium: ${current.lab || "—"}`);
+    if (current.paChecked) parts.push(`PA: ${current.pa || "—"}`);
+    if (current.radChecked) parts.push(`Radiologi: ${current.rad || "—"}`);
+    if (current.kulturChecked) parts.push(`Kultur: ${current.kultur || "—"}`);
 
     set({ procedures: parts.join(" | ") });
   };
