@@ -1,22 +1,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-
-type MockUser = {
-  email: string;
-  id: string;
-};
-
-type MockSession = {
-  access_token: string;
-  user: MockUser;
-};
+import { supabase } from "@/integrations/supabase/client";
+import type { Session, User } from "@supabase/supabase-js";
 
 type AuthCtx = {
-  session: MockSession | null;
-  user: MockUser | null;
+  session: Session | null;
+  user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
   signIn: (username: string, password: string) => Promise<boolean>;
-  updateCredentials: (username: string, password: string) => void;
+  updateCredentials: (username: string, password: string) => Promise<boolean>;
 };
 
 const Ctx = createContext<AuthCtx>({
@@ -25,70 +17,92 @@ const Ctx = createContext<AuthCtx>({
   loading: true,
   signOut: async () => {},
   signIn: async () => false,
-  updateCredentials: () => {},
+  updateCredentials: async () => false,
 });
 
+// Helper to format username into a valid email format for Supabase Auth
+const getEmail = (username: string) => username.includes('@') ? username : `${username.toLowerCase()}@sikopi.local`;
+const getUsername = (email: string) => email.split('@')[0];
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<MockSession | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize default credentials in localStorage if not set
   useEffect(() => {
-    if (!localStorage.getItem("sikopi_username")) {
-      localStorage.setItem("sikopi_username", "admin");
-    }
-    if (!localStorage.getItem("sikopi_password")) {
-      localStorage.setItem("sikopi_password", "admin");
-    }
+    // Initial session load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
 
-    const isLoggedIn = localStorage.getItem("sikopi_logged_in") === "true";
-    if (isLoggedIn) {
-      const activeUser = localStorage.getItem("sikopi_username") || "admin";
-      setSession({
-        access_token: "mock-session-token",
-        user: { email: activeUser, id: "mock-admin-id" },
-      });
-    }
-    setLoading(false);
+    // Listen to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (username: string, password: string): Promise<boolean> => {
-    const storedUsername = localStorage.getItem("sikopi_username") || "admin";
-    const storedPassword = localStorage.getItem("sikopi_password") || "admin";
-
-    if (username === storedUsername && password === storedPassword) {
-      localStorage.setItem("sikopi_logged_in", "true");
-      setSession({
-        access_token: "mock-session-token",
-        user: { email: username, id: "mock-admin-id" },
+    try {
+      const email = getEmail(username);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      return true;
+
+      if (error) {
+        console.error("Login failed:", error.message);
+        return false;
+      }
+      return !!data.session;
+    } catch (err) {
+      console.error("Auth error:", err);
+      return false;
     }
-    return false;
   };
 
   const signOut = async () => {
-    localStorage.removeItem("sikopi_logged_in");
-    setSession(null);
+    await supabase.auth.signOut();
   };
 
-  const updateCredentials = (newUsername: string, newPassword: string) => {
-    localStorage.setItem("sikopi_username", newUsername);
-    localStorage.setItem("sikopi_password", newPassword);
-    // If currently logged in, update the active session user info
-    if (session) {
-      setSession({
-        ...session,
-        user: { ...session.user, email: newUsername },
-      });
+  const updateCredentials = async (newUsername: string, newPassword: string): Promise<boolean> => {
+    try {
+      const updates: { email?: string; password?: string } = {};
+      
+      if (newUsername) {
+        updates.email = getEmail(newUsername);
+      }
+      if (newPassword) {
+        updates.password = newPassword;
+      }
+
+      const { error } = await supabase.auth.updateUser(updates);
+      
+      if (error) {
+        console.error("Update credentials failed:", error.message);
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      console.error("Update error:", err);
+      return false;
     }
   };
+
+  // Provide a mapped user object so UI components relying on user.email for username don't break
+  const user = session?.user ? { 
+    ...session.user, 
+    email: session.user.email ? getUsername(session.user.email) : 'admin' 
+  } : null;
 
   return (
     <Ctx.Provider
       value={{
         session,
-        user: session?.user ?? null,
+        user: user as unknown as User, // Cast to avoid deep type conflicts in UI,
         loading,
         signOut,
         signIn,

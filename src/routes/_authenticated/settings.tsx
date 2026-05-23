@@ -13,19 +13,20 @@ export const Route = createFileRoute("/_authenticated/settings")({
 });
 
 function SettingsPage() {
-  const { updateCredentials } = useAuth();
+  const { updateCredentials, user } = useAuth();
   const [username, setUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Load active username from local storage
+  // Load active username from auth context
   useEffect(() => {
-    const activeUsername = localStorage.getItem("sikopi_username") || "admin";
-    setUsername(activeUsername);
-  }, []);
+    if (user && user.email) {
+      setUsername(user.email);
+    }
+  }, [user]);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!username.trim()) {
@@ -34,8 +35,8 @@ function SettingsPage() {
     }
 
     if (newPassword) {
-      if (newPassword.length < 5) {
-        toast.error("Password baru minimal harus 5 karakter");
+      if (newPassword.length < 6) {
+        toast.error("Password baru minimal harus 6 karakter");
         return;
       }
       if (newPassword !== confirmPassword) {
@@ -46,16 +47,19 @@ function SettingsPage() {
 
     setBusy(true);
     try {
-      // If newPassword is empty, we only update the username and keep the old password
-      const activePassword = newPassword || localStorage.getItem("sikopi_password") || "admin";
-      updateCredentials(username.trim(), activePassword);
-
-      toast.success("Pengaturan akun berhasil diperbarui!");
-      // Clear password fields after success
-      setNewPassword("");
-      setConfirmPassword("");
+      // updateCredentials already maps the short username to the fake email internally
+      const success = await updateCredentials(username.trim(), newPassword);
+      
+      if (success) {
+        toast.success("Pengaturan akun berhasil diperbarui!");
+        // Clear password fields after success
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        toast.error("Gagal memperbarui pengaturan. Pastikan koneksi internet stabil.");
+      }
     } catch (err) {
-      toast.error("Gagal memperbarui pengaturan");
+      toast.error("Terjadi kesalahan sistem");
     } finally {
       setBusy(false);
     }
